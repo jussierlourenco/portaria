@@ -1,29 +1,72 @@
-import React from 'react';
-import { Plus, Users, BarChart3, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Users, BarChart3, Database, Trash2, Edit3 } from 'lucide-react';
+import { subscribeToRooms, addRoom, updateRoom, deleteRoom } from '../firebase/db';
+import RoomAdminModal from '../components/RoomAdminModal';
 
 const Admin = () => {
+  const [rooms, setRooms] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToRooms(setRooms);
+    return () => unsubscribe();
+  }, []);
+
+  const handleCreateNew = () => {
+    setEditingRoom(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (room) => {
+    setEditingRoom(room);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (roomId) => {
+    if (window.confirm('Tem certeza que deseja excluir esta sala? Esta ação não pode ser desfeita.')) {
+      await deleteRoom(roomId);
+    }
+  };
+
+  const handleSave = async (formData) => {
+    try {
+      if (editingRoom) {
+        await updateRoom(editingRoom.id, formData);
+      } else {
+        await addRoom(formData);
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      alert('Erro ao salvar sala: ' + error.message);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10">
-      <header className="mb-10 flex justify-between items-end">
+    <div className="space-y-10">
+      <header className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic">Administração</h1>
-          <p className="text-slate-500 font-medium">Controle total do Portaria CB</p>
+          <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic">Cadastro de Salas</h1>
+          <p className="text-slate-500 font-medium italic">Gerencie os espaços e horários do centro</p>
         </div>
-        <button className="btn-primary flex items-center gap-2">
+        <button 
+          onClick={handleCreateNew}
+          className="btn-primary flex items-center gap-2"
+        >
           <Plus size={20} />
-          <span>Nova Sala</span>
+          <span>Cadastrar Sala</span>
         </button>
       </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: 'Salas Ativas', value: '42', icon: Database, color: 'text-brand-primary' },
-          { label: 'Bedéis', value: '12', icon: Users, color: 'text-emerald-600' },
-          { label: 'Economia (Mês)', value: '14%', icon: BarChart3, color: 'text-amber-600' },
-          { label: 'Uso Médio', value: '8.5h/dia', icon: BarChart3, color: 'text-blue-600' },
+          { label: 'Total de Salas', value: rooms.length, icon: Database, color: 'text-brand-primary' },
+          { label: 'Em Uso Agora', value: rooms.filter(r => r.status === 'Aberta').length, icon: Users, color: 'text-emerald-600' },
+          { label: 'Salas Limpas', value: rooms.filter(r => r.status === 'Fechada').length, icon: BarChart3, color: 'text-amber-600' },
+          { label: 'Andares', value: [...new Set(rooms.map(r => r.pavilion))].length, icon: BarChart3, color: 'text-blue-600' },
         ].map(stat => (
-          <div key={stat.label} className="glass-card p-6 flex items-center gap-4">
-            <div className={`p-4 rounded-2xl bg-slate-50 ${stat.color}`}>
+          <div key={stat.label} className="glass-card p-6 flex items-center gap-4 border-white/50">
+            <div className={`p-4 rounded-2xl bg-slate-50/50 ${stat.color}`}>
               <stat.icon size={24} />
             </div>
             <div>
@@ -34,46 +77,76 @@ const Admin = () => {
         ))}
       </div>
 
-      <div className="glass-card overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+      <div className="glass-card overflow-hidden border-white/50">
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/10">
           <h2 className="text-lg font-black text-slate-800 uppercase tracking-tight">Listagem de Salas</h2>
-          <button className="text-sm font-bold text-brand-primary hover:underline">Exportar Relatório</button>
+          <div className="text-xs font-bold text-slate-400 italic">Total de {rooms.length} registros encontrados</div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50 text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                <th className="px-6 py-4">Sala</th>
-                <th className="px-6 py-4">Bloco</th>
-                <th className="px-6 py-4">Status Atual</th>
-                <th className="px-6 py-4">Última Ronda</th>
-                <th className="px-6 py-4">Ações</th>
+              <tr className="bg-slate-50/30 text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-8 py-5">Sala</th>
+                <th className="px-6 py-5">Andar / Pavimento</th>
+                <th className="px-6 py-5">Horário Previsto</th>
+                <th className="px-6 py-5">Status</th>
+                <th className="px-6 py-5 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {[
-                { name: 'Sala 101', block: 'Bloco A', status: 'Fechada', last: '15:30 por João' },
-                { name: 'Sala 102', block: 'Bloco A', status: 'Aberta', last: '16:00 por Maria' },
-                { name: 'Laboratório 04', block: 'Bloco B', status: 'Fechada', last: '14:20 por João' },
-              ].map(row => (
-                <tr key={row.name} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-slate-800">{row.name}</td>
-                  <td className="px-6 py-4 font-medium text-slate-500">{row.block}</td>
-                  <td className="px-6 py-4">
-                    <span className={`status-badge ${row.status === 'Aberta' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
-                      {row.status}
+              {rooms.map(room => (
+                <tr key={room.id} className="hover:bg-slate-50/30 transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="font-bold text-slate-800">{room.name}</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase">{room.block}</div>
+                  </td>
+                  <td className="px-6 py-5 font-medium text-slate-500">{room.pavilion || 'Não informado'}</td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
+                      {room.nextEventTime || '---'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className={`status-badge ${room.status === 'Aberta' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                      {room.status || 'Pendente'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">{row.last}</td>
-                  <td className="px-6 py-4">
-                    <button className="text-brand-primary font-bold text-sm hover:underline">Editar</button>
+                  <td className="px-6 py-5">
+                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => handleEdit(room)}
+                        className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-colors"
+                      >
+                        <Edit3 size={18} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(room.id)}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
+              {rooms.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-8 py-12 text-center text-slate-400 italic font-medium">
+                    Nenhuma sala cadastrada. Clique em "Cadastrar Sala" para começar.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      <RoomAdminModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        room={editingRoom}
+      />
     </div>
   );
 };

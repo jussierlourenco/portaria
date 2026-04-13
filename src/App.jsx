@@ -26,6 +26,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+import DashboardLayout from './layouts/DashboardLayout';
+
 function App() {
   return (
     <Router>
@@ -33,18 +35,22 @@ function App() {
         <div className="min-h-screen bg-slate-50 font-sans">
           <Routes>
             <Route path="/login" element={<Login />} />
-            
             <Route path="/consulta" element={<Colaborador />} />
 
+            {/* Authenticated Routes with Sidebar Layout */}
             <Route path="/" element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
               </ProtectedRoute>
             } />
 
             <Route path="/admin" element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <Admin />
+                <DashboardLayout>
+                  <Admin />
+                </DashboardLayout>
               </ProtectedRoute>
             } />
 

@@ -3,10 +3,8 @@ import { useAuth } from '../hooks/useAuth';
 import { subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
 import RoomCard from '../components/RoomCard';
 import RoomModal from '../components/RoomModal';
-import { LogOut, Filter, Search } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
 import { clsx } from 'clsx';
-import { auth } from '../firebase/config';
-import { signOut } from 'firebase/auth';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -44,29 +42,8 @@ const Dashboard = () => {
   const progress = rooms.length > 0 ? Math.round((completedCount / rooms.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      {/* Top Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <img 
-            src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
-            alt="Logo CB" 
-            className="h-10 drop-shadow-sm"
-          />
-          <div>
-            <h1 className="text-xl font-black text-brand-primary tracking-tighter uppercase">Portaria CB</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Painel do Inspetor</p>
-          </div>
-        </div>
-        <button 
-          onClick={() => signOut(auth)}
-          className="p-3 bg-slate-50 text-slate-400 hover:text-rose-500 rounded-2xl transition-all"
-        >
-          <LogOut size={20} />
-        </button>
-      </nav>
-
-      <main className="px-6 py-8 md:max-w-6xl md:mx-auto">
+    <div className="pb-20">
+      <main className="">
         {/* Welcome & Progress */}
         <section className="mb-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

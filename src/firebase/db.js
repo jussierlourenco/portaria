@@ -6,6 +6,7 @@ import {
   doc, 
   updateDoc, 
   addDoc, 
+  deleteDoc,
   serverTimestamp,
   orderBy
 } from 'firebase/firestore';
@@ -55,6 +56,31 @@ export const roomCheckOut = async (roomId, userId, checklist) => {
     type: 'check-out',
     userId,
     timestamp: serverTimestamp(),
-    checklist
   });
+};
+
+// --- Room Management (CRUD) ---
+
+// Add a new room
+export const addRoom = async (roomData) => {
+  await addDoc(collection(db, 'rooms'), {
+    ...roomData,
+    status: 'Fechada', // Default state
+    createdAt: serverTimestamp()
+  });
+};
+
+// Update existing room
+export const updateRoom = async (roomId, roomData) => {
+  const roomRef = doc(db, 'rooms', roomId);
+  await updateDoc(roomRef, {
+    ...roomData,
+    updatedAt: serverTimestamp()
+  });
+};
+
+// Delete a room
+export const deleteRoom = async (roomId) => {
+  const roomRef = doc(db, 'rooms', roomId);
+  await deleteDoc(roomRef);
 };
