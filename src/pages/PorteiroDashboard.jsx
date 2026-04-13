@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
+import { auth, subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
+import { signOut } from 'firebase/auth'; // Import direto para maior segurança
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const PorteiroDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isAlarmEnabled, setIsAlarmEnabled] = useState(false);
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.href = '/login'; // Garantir o redirecionamento
+    } catch (e) {
+      alert('Erro ao sair: ' + e.message);
+    }
+  };
+
 
   useEffect(() => {
     const unsubscribe = subscribeToRooms(setRooms);
@@ -200,12 +211,13 @@ const PorteiroDashboard = () => {
           <span className="text-[10px] font-black uppercase">Ronda</span>
         </button>
         <button 
-          onClick={logout}
-          className="flex flex-col items-center gap-1 text-slate-300 hover:text-rose-500 transition-colors"
+          onClick={handleLogout}
+          className="flex flex-col items-center gap-1 text-slate-300 hover:text-rose-500 transition-all active:scale-95"
         >
           <LogOut size={24} />
           <span className="text-[10px] font-black uppercase">Sair</span>
         </button>
+
       </footer>
     </div>
   );
