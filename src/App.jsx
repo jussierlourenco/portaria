@@ -45,6 +45,14 @@ const AppContent = () => {
   if (role === 'porteiro') {
     return <PorteiroDashboard />;
   }
+
+  if (role === 'gestor') {
+    return (
+      <DashboardLayout>
+        <Distribution />
+      </DashboardLayout>
+    );
+  }
   
   return (
     <DashboardLayout>
@@ -52,6 +60,7 @@ const AppContent = () => {
     </DashboardLayout>
   );
 };
+
 
 function App() {
   return (

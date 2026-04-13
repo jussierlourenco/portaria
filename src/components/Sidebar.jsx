@@ -22,8 +22,9 @@ const Sidebar = () => {
   const { role } = useAuth();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin'] },
     { icon: Calendar, label: 'Distribuição', path: '/admin/distribution' },
+
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
