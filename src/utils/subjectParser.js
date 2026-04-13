@@ -1,12 +1,17 @@
 export const parseSubjectsCSV = (csvContent, departments = []) => {
-  // Remove BOM se existir e normaliza quebras de linha
   const cleanContent = csvContent.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
   const lines = cleanContent.split('\n');
   const subjects = [];
   
-  console.log('Iniciando parsing de CSV. Total de linhas:', lines.length);
+  // Detecção automática de separador (vírgula ou ponto-e-vírgula)
+  const firstLine = lines[0] || '';
+  const separator = firstLine.includes(';') ? ';' : ',';
+  
+  console.log('--- SUBJECT PARSER DEBUG ---');
+  console.log('Total de linhas:', lines.length);
+  console.log('Separador detectado:', `"${separator}"`);
+  console.log('Primeira linha (header):', firstLine);
 
-  // Mapa para busca rápida de departamento
   const deptLookup = {};
   departments.forEach(d => {
     deptLookup[d.name.toLowerCase().trim()] = d.id;
@@ -17,14 +22,15 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // Split mais resiliente para CSV
+    // Split robusto para CSV (respeita aspas)
     const columns = [];
     let current = '';
     let inQuotes = false;
     
     for (let char of line) {
-      if (char === '"') inQuotes = !inQuotes;
-      else if (char === ',' && !inQuotes) {
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === separator && !inQuotes) {
         columns.push(current.trim().replace(/^"|"$/g, ''));
         current = '';
       } else {
@@ -33,29 +39,30 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
     }
     columns.push(current.trim().replace(/^"|"$/g, ''));
 
-    const code = columns[0];
+    const code = columns[0]?.toUpperCase();
     const name = columns[1];
-    const deptNameRaw = columns[2];
+    
+    // Log apenas das primeiras 3 linhas para diagnóstico
+    if (i < 4) {
+      console.log(`Linha ${i} Colunas:`, columns);
+    }
 
-    // Debug para a primeira linha de dados
-    if (i === 1) console.log('DEBUG Primeira Linha:', { code, name, deptNameRaw, columnsCount: columns.length });
-
+    // Regra: Código precisa ter pelo menos 6 caracteres e Nome precisa existir
     if (code && name && code.length >= 6) {
-      // Tenta encontrar o departamento
+      const deptNameRaw = columns[2];
       let deptId = null;
       if (deptNameRaw) {
         const cleanDeptName = deptNameRaw.replace('DEPT.', '').trim().toLowerCase();
         deptId = deptLookup[cleanDeptName] || deptLookup[deptNameRaw.toLowerCase()] || null;
       }
-      
       if (!deptId) {
         const sigla = code.substring(0, 3).toLowerCase();
         deptId = deptLookup[sigla] || null;
       }
 
       subjects.push({
-        code: code.toUpperCase(),
-        name: name,
+        code,
+        name,
         departmentId: deptId,
         credits: columns[3] || '',
         capacity: columns[5] || '',
@@ -67,7 +74,6 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
   // Remove duplicatas
   const uniqueSubjects = [];
   const seenCodes = new Set();
-  
   subjects.forEach(s => {
     if (!seenCodes.has(s.code)) {
       seenCodes.add(s.code);
@@ -75,8 +81,9 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
     }
   });
 
-  console.log('Parsing concluído. Válidos:', uniqueSubjects.length);
+  console.log('Parsing Finalizado. Válidos:', uniqueSubjects.length);
   return uniqueSubjects;
 };
+
 
 
