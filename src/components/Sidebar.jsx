@@ -8,7 +8,8 @@ import {
   History,
   ShieldCheck,
   Briefcase,
-  BookOpen
+  BookOpen,
+  Users
 } from 'lucide-react';
 import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
@@ -20,8 +21,10 @@ const Sidebar = () => {
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
+    { icon: Users, label: 'Usuários', path: '/admin/users' },
     { icon: History, label: 'Relatórios', path: '/logs' },
   ];
+
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-50">
