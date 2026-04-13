@@ -13,8 +13,9 @@ import {
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { subscribeToRooms, subscribeToSubjects, updateRoom } from '../firebase/db';
 import { SCHEDULE_DAYS, SCHEDULE_SLOTS, getPastelColor } from '../utils/scheduleConstants';
-import SubjectPickerModal from '../components/SubjectPickerModal';
+import SubjectDropdown from '../components/SubjectDropdown';
 import { clsx } from 'clsx';
+
 
 const Distribution = () => {
   const [rooms, setRooms] = useState([]);
@@ -231,12 +232,13 @@ const Distribution = () => {
         )}
       </AnimatePresence>
 
-      <SubjectPickerModal 
+      <SubjectDropdown 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleSubjectSelect}
         currentSubjectCode={activeCell ? tempSchedule[activeCell.day]?.[activeCell.slot] : null}
       />
+
 
       {/* Message Popup */}
       <AnimatePresence>
