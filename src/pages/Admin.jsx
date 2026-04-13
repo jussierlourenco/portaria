@@ -3,6 +3,7 @@ import { Plus, Users, BarChart3, Database, Trash2, Edit3 } from 'lucide-react';
 import { subscribeToRooms, subscribeToDepartments, addRoom, updateRoom, deleteRoom, syncRooms } from '../firebase/db';
 import RoomAdminModal from '../components/RoomAdminModal';
 import { parseRoomsCSV } from '../utils/csvParser';
+import { parseRoomsMetadataCSV } from '../utils/roomMetadataParser';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 
 const Admin = () => {
@@ -22,6 +23,8 @@ const Admin = () => {
   }, []);
 
   const deptMap = Object.fromEntries(departments.map(d => [d.id, d.sigla]));
+  // Mapa inverso para encontrar deptId pela sigla
+  const siglaToIdMap = Object.fromEntries(departments.map(d => [d.sigla.toUpperCase(), d.id]));
 
   const handleCreateNew = () => {
     setEditingRoom(null);
@@ -53,16 +56,48 @@ const Admin = () => {
   };
 
   const handleSync = async () => {
-    if (!window.confirm('Isso irá substituir todas as salas atuais pela escala do CSV. Deseja continuar?')) return;
+    if (!window.confirm('Isso irá substituir todas as salas atuais pelo cruzamento do mapa de horários e metadados de salas. Deseja continuar?')) return;
     
     setIsSyncing(true);
     try {
-      const response = await fetch('/mapa.csv');
-      const csvContent = await response.text();
-      const roomsData = parseRoomsCSV(csvContent);
+      // 1. Fetch de ambos os arquivos
+      const [metaRes, mapaRes] = await Promise.all([
+        fetch('/SALAS.csv'),
+        fetch('/mapa.csv')
+      ]);
+
+      const [metaCsv, mapaCsv] = await Promise.all([
+        metaRes.text(),
+        mapaRes.text()
+      ]);
+
+      // 2. Parse dos metadados e escala
+      const metadataMap = parseRoomsMetadataCSV(metaCsv);
+      const roomsWithSchedule = parseRoomsCSV(mapaCsv);
       
-      await syncRooms(roomsData);
-      alert(`${roomsData.length} salas sincronizadas com sucesso!`);
+      // 3. Consolidação
+      const consolidatedRooms = roomsWithSchedule.map(room => {
+        const meta = metadataMap.get(room.name.toLowerCase());
+        
+        // Tenta vincular departamento se a localização for uma sigla conhecida
+        let deptId = room.departmentId || null;
+        if (!deptId && meta?.location) {
+          const possibleSigla = meta.location.toUpperCase();
+          deptId = siglaToIdMap[possibleSigla] || null;
+        }
+
+        return {
+          ...room,
+          block: meta?.block || room.block || 'Pavilhão',
+          pavilion: meta?.pavilion || room.pavilion || 'Térreo',
+          locationDisplay: meta?.location || '',
+          departmentId: deptId
+        };
+      });
+
+      // 4. Salvar no Firestore
+      await syncRooms(consolidatedRooms);
+      alert(`${consolidatedRooms.length} salas sincronizadas com sucesso usando dados consolidados!`);
     } catch (error) {
       console.error(error);
       alert('Erro ao sincronizar: ' + error.message);

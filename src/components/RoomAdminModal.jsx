@@ -6,8 +6,9 @@ import { subscribeToDepartments } from '../firebase/db';
 const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
   const [formData, setFormData] = useState({
     name: room?.name || '',
-    block: room?.block || 'Bloco A',
-    pavilion: room?.pavilion || 'Térreo',
+    block: room?.block || 'NOVO',
+    pavilion: room?.pavilion || 'TÉRREO',
+    locationDisplay: room?.locationDisplay || '',
     departmentId: room?.departmentId || '',
     nextEventTime: room?.nextEventTime || ''
   });
@@ -76,10 +77,8 @@ const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
                     onChange={(e) => setFormData({...formData, block: e.target.value})}
                     className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 outline-none transition-all font-medium appearance-none"
                   >
-                    <option>Bloco A</option>
-                    <option>Bloco B</option>
-                    <option>Pavilhão</option>
-                    <option>Anexo</option>
+                    <option>NOVO</option>
+                    <option>ANTIGO</option>
                   </select>
                 </div>
                 <div>
@@ -89,12 +88,24 @@ const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
                     onChange={(e) => setFormData({...formData, pavilion: e.target.value})}
                     className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 outline-none transition-all font-medium appearance-none"
                   >
-                    <option>Térreo</option>
-                    <option>1º Pavimento</option>
-                    <option>2º Pavimento</option>
-                    <option>3º Pavimento</option>
+                    <option>TÉRREO</option>
+                    <option>1º ANDAR</option>
+                    <option>2º ANDAR</option>
+                    <option>3º ANDAR</option>
+                    <option>SUB-SOLO</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Localização Específica / Sigla</label>
+                <input 
+                  type="text" 
+                  value={formData.locationDisplay}
+                  onChange={(e) => setFormData({...formData, locationDisplay: e.target.value})}
+                  placeholder="Ex: 2ª SALA ou DMOR" 
+                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/5 outline-none transition-all font-medium" 
+                />
               </div>
 
               <div>

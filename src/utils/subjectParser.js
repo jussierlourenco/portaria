@@ -6,68 +6,59 @@
 export const parseSubjectsCSV = (csvContent, departments = []) => {
   const lines = csvContent.split('\n');
   const subjects = [];
-  let currentDeptId = null;
-
+  
   // Mapa para busca rápida de departamento por nome ou sigla
   const deptLookup = {};
   departments.forEach(d => {
     deptLookup[d.name.toLowerCase().trim()] = d.id;
     deptLookup[d.sigla.toLowerCase().trim()] = d.id;
+    // Adiciona variações comuns se necessário
+    if (d.name.includes(',')) {
+       const parts = d.name.split(',').map(p => p.trim().toLowerCase());
+       parts.forEach(p => { deptLookup[p] = d.id; });
+    }
   });
 
-  for (let i = 0; i < lines.length; i++) {
+  // Pula a primeira linha (cabeçalhos)
+  for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    const columns = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+    // Split robusto para lidar com aspas (ex: "DEPT. BOTÂNICA, ...")
+    const columns = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^)/g) || [];
+    const cleanColumns = columns.map(c => c.replace(/^"|"$/g, '').trim());
     
-    // Identifica mudança de departamento (geralmente linhas que começam com ,DEPT. ou similar)
-    // Ex: ,DEPT. ECOLOGIA,,,,,, ou ,"DEPT. BOTÂNICA, ECOLOGIA E ZOOLOGIA",,,,,,
-    const potentialDeptName = columns[1];
-    if (potentialDeptName && (potentialDeptName.startsWith('DEPT.') || potentialDeptName.includes('DEPARTAMENTOS'))) {
-      const cleanName = potentialDeptName.replace('DEPT.', '').trim();
-      
-      // Tenta encontrar o ID do departamento no sistema
-      // Se não encontrar exatamente, tenta por sigla (extratindo do início do código das disciplinas abaixo)
-      currentDeptId = deptLookup[cleanName.toLowerCase()] || 
-                     deptLookup[potentialDeptName.toLowerCase()] ||
-                     null;
-      continue;
-    }
-
-    // Pula cabeçalhos de coluna
-    if (columns[0] === 'COD' || columns[0] === 'CENTRO' || columns[0] === 'ESPAÇO') continue;
-
-    // Processa a disciplina
-    const code = columns[0];
-    let name = columns[1];
+    // Novas colunas: COD[0], DISCIPLINA[1], DEPARTAMENTO[2], CRD[3], T[4], CAP[5], HORÁRIO[6], LOCAL[7]
+    const code = cleanColumns[0];
+    const name = cleanColumns[1];
+    const deptNameRaw = cleanColumns[2];
 
     if (code && name && code.match(/^[A-Z]{3}[0-9]{4}$/)) {
-      // Limpa o nome se ele estiver no formato "CÓDIGO - NOME"
-      const nameParts = name.split(' - ');
-      if (nameParts.length > 1 && nameParts[0].trim() === code) {
-        name = nameParts.slice(1).join(' - ').trim();
+      // Tenta encontrar o departamento
+      let deptId = null;
+      if (deptNameRaw) {
+        const cleanDeptName = deptNameRaw.replace('DEPT.', '').trim().toLowerCase();
+        deptId = deptLookup[cleanDeptName] || deptLookup[deptNameRaw.toLowerCase()] || null;
       }
-
-      // Se ainda não temos um currentDeptId, tentamos inferir pela sigla do código (ex: DFS de DFS0108)
-      let deptId = currentDeptId;
+      
+      // Fallback pela sigla do código
       if (!deptId) {
-        const sigla = code.substring(0, 3);
-        deptId = deptLookup[sigla.toLowerCase()] || null;
+        const sigla = code.substring(0, 3).toLowerCase();
+        deptId = deptLookup[sigla] || null;
       }
 
       subjects.push({
         code,
         name,
         departmentId: deptId,
-        credits: columns[2] || '',
-        capacity: columns[4] || '',
-        fullLine: line // Para depuração se necessário
+        credits: cleanColumns[3] || '',
+        capacity: cleanColumns[5] || '',
+        fullLine: line
       });
     }
   }
 
-  // Remove duplicatas (mesmo código pode aparecer várias vezes se tiver turmas diferentes)
+  // Remove duplicatas por código
   const uniqueSubjects = [];
   const seenCodes = new Set();
   
@@ -80,3 +71,4 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
 
   return uniqueSubjects;
 };
+
