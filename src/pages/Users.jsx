@@ -69,17 +69,19 @@ const Users = () => {
   };
 
   const filteredUsers = users.filter(u => {
+    const status = u.status || 'active';
     if (filter === 'all') return true;
-    if (filter === 'pending') return u.status === 'pending';
-    if (filter === 'active') return u.status === 'active';
+    if (filter === 'pending') return status === 'pending';
+    if (filter === 'active') return status === 'active';
     return true;
   });
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'active': return <span className="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Ativo</span>;
-      case 'pending': return <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Pendente</span>;
-      case 'blocked': return <span className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Bloqueado</span>;
+    const s = status || 'active';
+    switch (s) {
+      case 'active': return <span className="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Ativo</span>;
+      case 'pending': return <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Pendente</span>;
+      case 'blocked': return <span className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Bloqueado</span>;
       default: return null;
     }
   };
@@ -105,7 +107,7 @@ const Users = () => {
         {[
           { label: 'Total de Usuários', value: users.length, icon: Shield, color: 'text-brand-primary' },
           { label: 'Aguardando Aprovação', value: users.filter(u => u.status === 'pending').length, icon: ShieldAlert, color: 'text-amber-500' },
-          { label: 'Contas Ativas', value: users.filter(u => u.status === 'active').length, icon: BadgeCheck, color: 'text-emerald-600' },
+          { label: 'Contas Ativas', value: users.filter(u => (u.status || 'active') === 'active').length, icon: BadgeCheck, color: 'text-emerald-600' },
         ].map(stat => (
           <div key={stat.label} className="glass-card p-6 flex items-center gap-4">
             <div className={`p-4 rounded-2xl bg-slate-50 ${stat.color}`}>
@@ -118,6 +120,7 @@ const Users = () => {
           </div>
         ))}
       </div>
+
 
       {/* Filters */}
       <div className="flex gap-2">
