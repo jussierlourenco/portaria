@@ -22,43 +22,6 @@ const PorteiroDashboard = () => {
     }
   };
 
-
-  useEffect(() => {
-    const unsubscribe = subscribeToRooms(setRooms);
-    return () => unsubscribe();
-  }, []);
-
-  // Monitorar horários para o Alarme
-  useEffect(() => {
-    if (!isAlarmEnabled) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const currentMinute = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
-      if (lastNotificationTime === currentMinute) return;
-
-      rooms.forEach(room => {
-        const { nextStartTime, nextClass } = getRoomScheduleStatus(room.schedule);
-        
-        // Se falta 5 minutos para uma aula e a sala está fechada
-        if (nextStartTime && room.status === 'Fechada') {
-          const [h, m] = nextStartTime.split(':').map(Number);
-          const startTime = new Date();
-          startTime.setHours(h, m, 0, 0);
-          
-          const diff = (startTime - now) / (1000 * 60);
-          if (diff > 0 && diff <= 5) {
-             playAlarm();
-             setLastNotificationTime(currentMinute);
-          }
-        }
-      });
-    }, 30000); // Checa a cada 30 segundos
-
-    return () => clearInterval(interval);
-  }, [rooms, isAlarmEnabled, lastNotificationTime]);
-
   const playAlarm = () => {
     try {
       const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -91,6 +54,44 @@ const PorteiroDashboard = () => {
       await roomCheckOut(roomId, user.uid, { ac: true, lights: true, windows: true });
     }
   };
+
+  useEffect(() => {
+    const unsubscribe = subscribeToRooms(setRooms);
+    return () => unsubscribe();
+  }, []);
+
+  // Monitorar horários para o Alarme
+  useEffect(() => {
+    if (!isAlarmEnabled) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentMinute = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      if (lastNotificationTime === currentMinute) return;
+
+      rooms.forEach(room => {
+        const { nextStartTime } = getRoomScheduleStatus(room.schedule);
+        
+        // Se falta 5 minutos para uma aula e a sala está fechada
+
+        if (nextStartTime && room.status === 'Fechada') {
+          const [h, m] = nextStartTime.split(':').map(Number);
+          const startTime = new Date();
+          startTime.setHours(h, m, 0, 0);
+          
+          const diff = (startTime - now) / (1000 * 60);
+          if (diff > 0 && diff <= 5) {
+             playAlarm();
+             setLastNotificationTime(currentMinute);
+          }
+        }
+      });
+    }, 30000); // Checa a cada 30 segundos
+
+    return () => clearInterval(interval);
+  }, [rooms, isAlarmEnabled, lastNotificationTime]);
+
 
   // Categorizar salas para o Porteiro
   const salasParaAbrir = rooms.filter(r => {
