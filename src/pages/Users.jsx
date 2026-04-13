@@ -1,16 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, UserCheck, UserX, Crown, ShieldAlert, BadgeCheck } from 'lucide-react';
-import { subscribeToUsers, updateUserData } from '../firebase/db';
+import { 
+  Shield, 
+  UserCheck, 
+  UserX, 
+  Crown, 
+  ShieldAlert, 
+  BadgeCheck, 
+  Edit3, 
+  Trash2,
+  UserPlus
+} from 'lucide-react';
+import { subscribeToUsers, updateUserData, deleteUser } from '../firebase/db';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import UserAdminModal from '../components/UserAdminModal';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToUsers(setUsers);
     return () => unsubscribe();
   }, []);
+
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCreateNew = () => {
+    setSelectedUser(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (userId) => {
+    if (window.confirm('Tem certeza que deseja excluir este usuário permanentemente?')) {
+      try {
+        await deleteUser(userId);
+      } catch (e) {
+        alert('Erro ao excluir usuário: ' + e.message);
+      }
+    }
+  };
+
+  const handleSaveUser = async (formData) => {
+    try {
+      if (selectedUser) {
+        await updateUserData(selectedUser.id, formData);
+      } else {
+        // Para criar um novo usuário manualmente (opcional)
+        // Por enquanto focamos no update
+        alert('Criação manual não implementada; use o convite para novos usuários.');
+      }
+      setIsModalOpen(false);
+    } catch (e) {
+      alert('Erro ao salvar usuário: ' + e.message);
+    }
+  };
 
   const handleStatusChange = async (userId, newStatus) => {
     try {
@@ -51,6 +99,13 @@ const Users = () => {
           <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic line-clamp-1">Gestão de Usuários</h1>
           <p className="text-slate-500 font-medium italic">Controle de acessos e permissões administrativas</p>
         </div>
+        <button 
+          onClick={handleCreateNew}
+          className="btn-primary flex items-center gap-2"
+        >
+          <UserPlus size={20} />
+          <span>Novo Usuário</span>
+        </button>
       </header>
 
       {/* Stats */}
@@ -100,7 +155,7 @@ const Users = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              <AnimatePresence>
+              <AnimatePresence mode="popLayout">
                 {filteredUsers.map(user => (
                   <Motion.tr 
                     layout
@@ -124,14 +179,9 @@ const Users = () => {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-2">
                         {user.role === 'admin' ? <Crown size={14} className="text-amber-500" /> : <Shield size={14} className="text-slate-400" />}
-                        <select 
-                          value={user.role} 
-                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                          className="bg-transparent font-bold text-slate-600 text-xs focus:outline-none cursor-pointer hover:text-brand-primary"
-                        >
-                          <option value="porteiro">Porteiro</option>
-                          <option value="admin">Administrador</option>
-                        </select>
+                        <span className="font-bold text-slate-600 text-xs uppercase truncate max-w-[100px]">
+                          {user.role}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-center">
@@ -148,6 +198,15 @@ const Users = () => {
                             <span>Aprovar</span>
                           </button>
                         )}
+                        
+                        <button 
+                          onClick={() => handleEdit(user)}
+                          className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded-xl transition-all"
+                          title="Editar Usuário"
+                        >
+                          <Edit3 size={18} />
+                        </button>
+
                         {user.status === 'active' && (
                           <button 
                              onClick={() => handleStatusChange(user.id, 'blocked')}
@@ -157,15 +216,14 @@ const Users = () => {
                             <UserX size={18} />
                           </button>
                         )}
-                        {user.status === 'blocked' && (
-                          <button 
-                            onClick={() => handleStatusChange(user.id, 'active')}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all text-[10px] font-black uppercase"
-                          >
-                            <UserCheck size={14} />
-                            <span>Reativar</span>
-                          </button>
-                        )}
+
+                        <button 
+                          onClick={() => handleDelete(user.id)}
+                          className="p-2 text-rose-200 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                          title="Excluir Usuário"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </td>
                   </Motion.tr>
@@ -180,8 +238,16 @@ const Users = () => {
           )}
         </div>
       </div>
+
+      <UserAdminModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveUser}
+        user={selectedUser}
+      />
     </div>
   );
 };
+
 
 export default Users;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Shield, Mail, User, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
   const [formData, setFormData] = useState({
@@ -38,7 +38,7 @@ const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div 
+        <Motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -46,7 +46,7 @@ const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         />
         
-        <motion.div 
+        <Motion.div 
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -141,9 +141,10 @@ const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
               {user ? 'Salvar Alterações' : 'Criar Usuário'}
             </button>
           </form>
-        </motion.div>
+        </Motion.div>
       </div>
     </AnimatePresence>
+
   );
 };
 
