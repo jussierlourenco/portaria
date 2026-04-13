@@ -12,6 +12,8 @@ import PorteiroDashboard from './pages/PorteiroDashboard';
 import Users from './pages/Users';
 import WaitingApproval from './pages/WaitingApproval';
 import Distribution from './pages/Distribution';
+import Mosaic from './pages/Mosaic';
+
 
 
 import Colaborador from './pages/Colaborador';
@@ -70,6 +72,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/consulta" element={<Colaborador />} />
+            
+            {/* Rota de acesso público ao mosaico */}
+            <Route path="/mapa" element={<Mosaic />} />
 
             {/* Authenticated Routes */}
             <Route path="/" element={
@@ -79,12 +84,22 @@ function App() {
             } />
 
             <Route path="/admin" element={
-              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
+              <ProtectedRoute allowedRoles={['admin', 'gestor', 'porteiro']}>
                 <DashboardLayout>
                   <Admin />
                 </DashboardLayout>
               </ProtectedRoute>
             } />
+
+            {/* Link para o Mosaico dentro do layout para usuários logados */}
+             <Route path="/admin/mosaic" element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Mosaic />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
 
 
             <Route path="/admin/users" element={

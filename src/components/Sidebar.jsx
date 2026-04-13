@@ -10,8 +10,10 @@ import {
   Briefcase,
   BookOpen,
   Users,
-  Calendar
+  Calendar,
+  Map
 } from 'lucide-react';
+
 import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
 import { clsx } from 'clsx';
@@ -23,7 +25,9 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin'] },
+    { icon: Map, label: 'Mapa de Salas', path: '/admin/mosaic' },
     { icon: Calendar, label: 'Distribuição', path: '/admin/distribution' },
+
 
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },

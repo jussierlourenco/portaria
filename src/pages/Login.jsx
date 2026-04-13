@@ -6,7 +6,8 @@ import {
   updateProfile 
 } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, UserPlus, LogIn, AlertCircle } from 'lucide-react';
+import { User, Mail, Lock, UserPlus, LogIn, AlertCircle, Map } from 'lucide-react';
+
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
@@ -204,8 +205,19 @@ const Login = () => {
             <>Novo por aqui? <button onClick={toggleMode} className="text-brand-primary hover:underline ml-1">Solicitar Acesso</button></>
           )}
         </p>
+
+        <div className="mt-8 pt-8 border-t border-slate-100/50 text-center">
+           <button 
+            onClick={() => navigate('/mapa')}
+            className="flex items-center justify-center gap-2 mx-auto px-6 py-3 rounded-xl border border-slate-100 text-slate-400 hover:text-brand-primary hover:border-brand-primary/20 hover:bg-brand-primary/5 transition-all font-black text-[9px] uppercase tracking-widest"
+           >
+              <Map size={14} className="text-brand-primary" />
+              Ver Mapa de Ocupação das Salas
+           </button>
+        </div>
       </Motion.div>
     </div>
+
   );
 };
 

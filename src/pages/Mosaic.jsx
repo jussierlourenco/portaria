@@ -1,0 +1,236 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Clock, 
+  MapPin, 
+  Calendar, 
+  Search, 
+  Info, 
+  LayoutGrid,
+  Map,
+  ArrowRight,
+  Navigation
+} from 'lucide-react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { subscribeToRooms, subscribeToSubjects } from '../firebase/db';
+import { SCHEDULE_DAYS, SCHEDULE_SLOTS, getPastelColor } from '../utils/scheduleConstants';
+import { clsx } from 'clsx';
+import { Link } from 'react-router-dom';
+
+const Mosaic = () => {
+  const [rooms, setRooms] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedDay, setSelectedDay] = useState('seg');
+  const [activeInfo, setActiveInfo] = useState(null); // { room, slot, subject }
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const unsubRooms = subscribeToRooms(setRooms);
+    const unsubSubjects = subscribeToSubjects(setSubjects);
+    return () => {
+      unsubRooms();
+      unsubSubjects();
+    };
+  }, []);
+
+  const getSubjectInfo = (code) => {
+    const subject = subjects.find(s => s.code === code);
+    const departmentName = subject?.department || subject?.departmentId || code.substring(0, 3) || 'Geral';
+    
+    if (subject) {
+      return { ...subject, department: departmentName };
+    }
+    
+    return { 
+      code, 
+      name: 'Disciplina não encontrada', 
+      department: departmentName 
+    };
+  };
+
+  const filteredRooms = rooms.filter(r => 
+    r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.block.toLowerCase().includes(searchTerm.toLowerCase())
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-6 md:p-10 space-y-10">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 max-w-[1600px] mx-auto">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+             <div className="w-12 h-12 bg-brand-primary text-white rounded-2xl flex items-center justify-center shadow-xl shadow-brand-primary/20">
+                <Map size={24} />
+             </div>
+             <div>
+               <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic leading-none">Mapa de Ocupação</h1>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Visão geral do centro de biociências (CB)</p>
+             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 bg-white p-2 rounded-[1.5rem] border border-slate-100 shadow-sm">
+          {SCHEDULE_DAYS.map(day => (
+            <button
+              key={day.id}
+              onClick={() => setSelectedDay(day.id)}
+              className={clsx(
+                "px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
+                selectedDay === day.id 
+                  ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" 
+                  : "bg-transparent text-slate-400 hover:text-brand-primary hover:bg-slate-50"
+              )}
+            >
+              {day.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* Main Grid View */}
+      <div className="max-w-[1600px] mx-auto space-y-6">
+        {/* Toolbar */}
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1 group w-full">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-brand-primary transition-colors" size={18} />
+            <input 
+              type="text" 
+              placeholder="Buscar sala (ex: SALA 1, Laboratório)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-slate-100 outline-none focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary/20 transition-all font-bold text-xs text-slate-600 shadow-sm"
+            />
+          </div>
+          
+          <div className="bg-white/50 px-4 py-2 rounded-xl text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-3 border border-slate-100">
+             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-300"></div> Sala Livre</div>
+             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-brand-primary"></div> Ocupada</div>
+          </div>
+        </div>
+
+        <div className="glass-card overflow-hidden border-white/50 group/table shadow-xl shadow-slate-200/50">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full border-collapse min-w-[1400px]">
+
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100 shadow-sm sticky top-0 z-10">
+                  <th className="p-5 text-left min-w-[200px] sticky left-0 bg-slate-50 border-r border-slate-100">
+                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                       <MapPin size={14} /> Sala / Bloco
+                     </div>
+                  </th>
+                  {SCHEDULE_SLOTS.map(slot => (
+                    <th key={slot} className="p-4 text-center min-w-[80px]">
+                      <span className="text-[9px] font-black text-slate-500">{slot}</span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredRooms.map((room) => (
+                  <tr key={room.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="p-5 sticky left-0 bg-white border-r border-slate-100 shadow-sm z-[9]">
+                       <div className="flex flex-col">
+                          <span className="text-xs font-black text-slate-800 uppercase tracking-tight truncate">{room.name}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{room.block} • {room.pavilion}</span>
+                       </div>
+                    </td>
+                    {SCHEDULE_SLOTS.map(slot => {
+                      const subjectCode = room.schedule?.[selectedDay]?.[slot];
+                      const info = subjectCode ? getSubjectInfo(subjectCode) : null;
+                      const pastelClass = info ? getPastelColor(info.department) : 'bg-transparent text-slate-200';
+
+                      return (
+                        <td key={`${room.id}-${slot}`} className="p-1 min-w-[80px]">
+                          <Motion.div 
+                            whileHover={{ scale: 1.05 }}
+                            onClick={() => info && setActiveInfo({ room, slot, subject: info })}
+                            className={clsx(
+                              "w-full h-10 rounded-lg flex items-center justify-center cursor-pointer transition-all border border-transparent text-[9px] font-black",
+                              info ? `${pastelClass} shadow-sm border-white/50 active:scale-95` : "text-slate-100 flex items-center justify-center opacity-30 hover:opacity-100 hover:bg-slate-100"
+                            )}
+                          >
+                            {info ? info.code : '+'}
+                          </Motion.div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Info Modal / Tooltip */}
+      <AnimatePresence>
+        {activeInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/10 backdrop-blur-sm" onClick={() => setActiveInfo(null)}>
+            <Motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100"
+            >
+              <div className={clsx("h-3", getPastelColor(activeInfo.subject.department).split(' ')[0])}></div>
+              
+              <div className="p-8 space-y-6">
+                 <div className="flex justify-between items-start">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-primary/5 flex items-center justify-center text-brand-primary">
+                       <Clock size={24} />
+                    </div>
+                    <button onClick={() => setActiveInfo(null)} className="p-2 hover:bg-slate-50 rounded-full transition-colors">
+                       <LayoutGrid size={20} className="text-slate-300" />
+                    </button>
+                 </div>
+
+                 <div className="space-y-1">
+                    <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest">{activeInfo.subject.code}</p>
+                    <h3 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">{activeInfo.subject.name}</h3>
+                    <p className="text-xs font-bold text-slate-400">{activeInfo.subject.department}</p>
+                 </div>
+
+                 <div className="pt-6 border-t border-slate-50 space-y-4">
+                    <div className="flex items-center gap-3">
+                       <MapPin size={18} className="text-slate-300" />
+                       <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sala / Localização</p>
+                          <p className="text-sm font-bold text-slate-600">{activeInfo.room.name} ({activeInfo.room.block})</p>
+                       </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                       <Calendar size={18} className="text-slate-300" />
+                       <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Horário</p>
+                          <p className="text-sm font-bold text-slate-600 uppercase italic">{SCHEDULE_DAYS.find(d => d.id === selectedDay)?.label} • {activeInfo.slot}</p>
+                       </div>
+                    </div>
+                 </div>
+
+                 <button 
+                  onClick={() => setActiveInfo(null)}
+                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                >
+                  Fechar Detalhes
+                </button>
+              </div>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Login Link for users who stumbled here */}
+      <footer className="max-w-[1600px] mx-auto pt-10 border-t border-slate-100 flex flex-col items-center">
+         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 italic">Sistema Portaria CB • CB-Biociências UFRN</p>
+         <Link 
+          to="/login"
+          className="flex items-center gap-2 text-brand-primary font-black text-[10px] uppercase tracking-widest hover:gap-4 transition-all"
+         >
+           Acesso Administrativo <ArrowRight size={14} />
+         </Link>
+      </footer>
+    </div>
+  );
+};
+
+export default Mosaic;
