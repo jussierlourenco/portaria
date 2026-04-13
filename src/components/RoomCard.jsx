@@ -1,9 +1,11 @@
 import React from 'react';
-import { LogIn, LogOut, Clock, MapPin } from 'lucide-react';
+import { LogIn, LogOut, Clock, MapPin, BookOpen } from 'lucide-react';
 import { clsx } from 'clsx';
+import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 
 const RoomCard = ({ room, onAction }) => {
   const isClosed = room.status === 'Fechada' || !room.status;
+  const scheduleStatus = getRoomScheduleStatus(room.schedule);
   
   return (
     <div className="glass-card p-5 hover:shadow-2xl transition-all cursor-pointer group flex flex-col justify-between h-full">
@@ -17,24 +19,34 @@ const RoomCard = ({ room, onAction }) => {
           </div>
           <h3 className="text-xl font-black text-slate-800 tracking-tight">{room.name}</h3>
         </div>
-        <span className={clsx(
-          "status-badge",
-          room.status === 'Aberta' ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"
-        )}>
-          {room.status || 'Pendente'}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <span className={clsx(
+            "status-badge",
+            room.status === 'Aberta' ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"
+          )}>
+            {room.status || 'Pendente'}
+          </span>
+          {scheduleStatus.isOccupied && (
+            <span className="flex items-center gap-1 px-3 py-1 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-tighter rounded-full border border-brand-primary/20 animate-pulse">
+              <BookOpen size={10} />
+              Em Aula
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="bg-slate-50/50 rounded-xl p-3 mb-6 border border-slate-100">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Clock size={16} className="text-brand-primary" />
-          <span className="font-bold">Próximo Evento:</span>
+          <span className="font-bold">
+            {scheduleStatus.isOccupied ? 'Aula Atual:' : 'Próximo Evento:'}
+          </span>
         </div>
-        <p className="text-sm text-slate-700 mt-1 pl-6">
-          {room.nextEventName || 'Sem aulas agendadas'}
+        <p className="text-sm text-slate-700 mt-1 pl-6 line-clamp-1 font-medium">
+          {scheduleStatus.isOccupied ? scheduleStatus.currentClass : (scheduleStatus.nextClass || 'Sem aulas agendadas')}
         </p>
-        <p className="text-xs text-slate-400 pl-6">
-          {room.nextEventTime || '--:--'}
+        <p className="text-xs text-slate-400 pl-6 font-bold">
+          {scheduleStatus.isOccupied ? 'Agora' : (scheduleStatus.nextStartTime || '--:--')}
         </p>
       </div>
 

@@ -6,6 +6,7 @@ import {
   doc, 
   updateDoc, 
   addDoc, 
+  getDocs,
   deleteDoc,
   serverTimestamp,
   orderBy
@@ -60,6 +61,23 @@ export const roomCheckOut = async (roomId, userId, checklist) => {
 };
 
 // --- Room Management (CRUD) ---
+
+// Sincronizar todas as salas (Limpa e Re-adiciona)
+export const syncRooms = async (roomsData) => {
+  const roomsCol = collection(db, 'rooms');
+  
+  // 1. Buscar todas as salas atuais para deletar
+  const snapshot = await getDocs(roomsCol);
+  const deletePromises = snapshot.docs.map(docSnapshot => deleteDoc(doc(db, 'rooms', docSnapshot.id)));
+  await Promise.all(deletePromises);
+
+  // 2. Adicionar novas salas
+  const addPromises = roomsData.map(room => addDoc(roomsCol, {
+    ...room,
+    createdAt: serverTimestamp()
+  }));
+  await Promise.all(addPromises);
+};
 
 // Add a new room
 export const addRoom = async (roomData) => {

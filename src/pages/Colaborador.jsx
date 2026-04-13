@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { subscribeToRooms } from '../firebase/db';
-import { Search, MapPin, Clock } from 'lucide-react';
+import { Search, MapPin, Clock, BookOpen } from 'lucide-react';
 import { clsx } from 'clsx';
+import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 
 const Colaborador = () => {
   const [rooms, setRooms] = useState([]);
@@ -42,28 +43,41 @@ const Colaborador = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredRooms.map(room => (
-            <div key={room.id} className="glass-card p-6 flex justify-between items-center bg-white/40">
-              <div>
-                <h3 className="text-xl font-black text-slate-800 tracking-tight">{room.name}</h3>
-                <div className="flex items-center gap-1 text-slate-400 text-xs font-bold uppercase mt-1">
-                  <MapPin size={12} />
-                  <span>{room.block}</span>
+          {filteredRooms.map(room => {
+            const scheduleStatus = getRoomScheduleStatus(room.schedule);
+            const isPortariaOpen = room.status === 'Aberta';
+            
+            return (
+              <div key={room.id} className="glass-card p-6 flex justify-between items-center bg-white/40">
+                <div>
+                  <h3 className="text-xl font-black text-slate-800 tracking-tight">{room.name}</h3>
+                  <div className="flex items-center gap-1 text-slate-400 text-xs font-bold uppercase mt-1">
+                    <MapPin size={12} />
+                    <span>{room.block} • {room.pavilion}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={clsx(
+                      "px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest",
+                      isPortariaOpen ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"
+                    )}>
+                      {isPortariaOpen ? 'Aberta' : 'Livre'}
+                    </span>
+                    {scheduleStatus.isOccupied && (
+                      <span className="flex items-center gap-1 px-3 py-1 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase rounded-full border border-brand-primary/20">
+                        <BookOpen size={10} />
+                        Há Aula Agora
+                      </span>
+                    )}
+                  </div>
+                  {!scheduleStatus.isOccupied && scheduleStatus.nextStartTime && (
+                    <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase">Livre até {scheduleStatus.nextStartTime}</p>
+                  )}
                 </div>
               </div>
-              <div className="text-right">
-                <span className={clsx(
-                  "px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest",
-                   room.status === 'Aberta' ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"
-                )}>
-                  {room.status === 'Aberta' ? 'Em Uso' : 'Livre'}
-                </span>
-                {room.status === 'Fechada' && room.nextEventTime && (
-                  <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase">Livre até {room.nextEventTime}</p>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

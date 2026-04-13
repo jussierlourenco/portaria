@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Users, BarChart3, Database, Trash2, Edit3 } from 'lucide-react';
-import { subscribeToRooms, addRoom, updateRoom, deleteRoom } from '../firebase/db';
+import { subscribeToRooms, addRoom, updateRoom, deleteRoom, syncRooms } from '../firebase/db';
 import RoomAdminModal from '../components/RoomAdminModal';
+import { parseRoomsCSV } from '../utils/csvParser';
+import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 
 const Admin = () => {
   const [rooms, setRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToRooms(setRooms);
@@ -42,6 +45,25 @@ const Admin = () => {
     }
   };
 
+  const handleSync = async () => {
+    if (!window.confirm('Isso irá substituir todas as salas atuais pela escala do CSV. Deseja continuar?')) return;
+    
+    setIsSyncing(true);
+    try {
+      const response = await fetch('/mapa.csv');
+      const csvContent = await response.text();
+      const roomsData = parseRoomsCSV(csvContent);
+      
+      await syncRooms(roomsData);
+      alert(`${roomsData.length} salas sincronizadas com sucesso!`);
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao sincronizar: ' + error.message);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   return (
     <div className="space-y-10">
       <header className="flex justify-between items-end">
@@ -49,20 +71,30 @@ const Admin = () => {
           <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic">Cadastro de Salas</h1>
           <p className="text-slate-500 font-medium italic">Gerencie os espaços e horários do centro</p>
         </div>
-        <button 
-          onClick={handleCreateNew}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus size={20} />
-          <span>Cadastrar Sala</span>
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={handleSync}
+            disabled={isSyncing}
+            className="flex items-center gap-2 px-6 py-4 rounded-2xl font-bold bg-white text-slate-500 border border-slate-100 hover:bg-slate-50 transition-all disabled:opacity-50"
+          >
+            <Database size={20} />
+            <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar CSV'}</span>
+          </button>
+          <button 
+            onClick={handleCreateNew}
+            className="btn-primary flex items-center gap-2"
+          >
+            <Plus size={20} />
+            <span>Cadastrar Sala</span>
+          </button>
+        </div>
       </header>
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           { label: 'Total de Salas', value: rooms.length, icon: Database, color: 'text-brand-primary' },
-          { label: 'Em Uso Agora', value: rooms.filter(r => r.status === 'Aberta').length, icon: Users, color: 'text-emerald-600' },
-          { label: 'Salas Limpas', value: rooms.filter(r => r.status === 'Fechada').length, icon: BarChart3, color: 'text-amber-600' },
+          { label: 'Salas em Aula', value: rooms.filter(r => getRoomScheduleStatus(r.schedule).isOccupied).length, icon: Users, color: 'text-emerald-600' },
+          { label: 'Portas Abertas', value: rooms.filter(r => r.status === 'Aberta').length, icon: BarChart3, color: 'text-amber-600' },
           { label: 'Andares', value: [...new Set(rooms.map(r => r.pavilion))].length, icon: BarChart3, color: 'text-blue-600' },
         ].map(stat => (
           <div key={stat.label} className="glass-card p-6 flex items-center gap-4 border-white/50">
