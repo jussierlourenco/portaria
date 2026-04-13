@@ -106,20 +106,27 @@ const Mosaic = () => {
           </div>
         </div>
 
+        {/* Sugestão de Orientação (Apenas Mobile) */}
+        <div className="md:hidden flex items-center gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+           <Navigation size={18} className="text-brand-primary animate-pulse" />
+           <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
+             Dica: Gire o celular para o modo <span className="text-brand-primary">Horizontal</span> para uma visão panorâmica do mosaico.
+           </p>
+        </div>
+
         <div className="glass-card overflow-hidden border-white/50 group/table shadow-xl shadow-slate-200/50">
           <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full border-collapse min-w-[1400px]">
-
+            <table className="w-full border-collapse md:min-w-[1400px] min-w-[1000px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 shadow-sm sticky top-0 z-10">
-                  <th className="p-5 text-left min-w-[200px] sticky left-0 bg-slate-50 border-r border-slate-100">
-                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                       <MapPin size={14} /> Sala / Bloco
+                  <th className="p-3 md:p-5 text-left md:min-w-[200px] min-w-[120px] sticky left-0 bg-slate-50 border-r border-slate-100">
+                     <div className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                       <MapPin size={12} className="md:w-3.5 md:h-3.5" /> Sala
                      </div>
                   </th>
                   {SCHEDULE_SLOTS.map(slot => (
-                    <th key={slot} className="p-4 text-center min-w-[80px]">
-                      <span className="text-[9px] font-black text-slate-500">{slot}</span>
+                    <th key={slot} className="p-2 md:p-4 text-center md:min-w-[80px] min-w-[60px]">
+                      <span className="text-[8px] md:text-[9px] font-black text-slate-500">{slot}</span>
                     </th>
                   ))}
                 </tr>
@@ -127,10 +134,10 @@ const Mosaic = () => {
               <tbody className="divide-y divide-slate-100">
                 {filteredRooms.map((room) => (
                   <tr key={room.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="p-5 sticky left-0 bg-white border-r border-slate-100 shadow-sm z-[9]">
+                    <td className="p-3 md:p-5 sticky left-0 bg-white border-r border-slate-100 shadow-sm z-[9]">
                        <div className="flex flex-col">
-                          <span className="text-xs font-black text-slate-800 uppercase tracking-tight truncate">{room.name}</span>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{room.block} • {room.pavilion}</span>
+                          <span className="text-[10px] md:text-xs font-black text-slate-800 uppercase tracking-tight truncate">{room.name}</span>
+                          <span className="hidden md:block text-[9px] font-bold text-slate-400 uppercase tracking-widest">{room.block} • {room.pavilion}</span>
                        </div>
                     </td>
                     {SCHEDULE_SLOTS.map(slot => {
@@ -139,12 +146,12 @@ const Mosaic = () => {
                       const pastelClass = info ? getPastelColor(info.department) : 'bg-transparent text-slate-200';
 
                       return (
-                        <td key={`${room.id}-${slot}`} className="p-1 min-w-[80px]">
+                        <td key={`${room.id}-${slot}`} className="p-0.5 md:p-1 md:min-w-[80px] min-w-[60px]">
                           <Motion.div 
                             whileHover={{ scale: 1.05 }}
                             onClick={() => info && setActiveInfo({ room, slot, subject: info })}
                             className={clsx(
-                              "w-full h-10 rounded-lg flex items-center justify-center cursor-pointer transition-all border border-transparent text-[9px] font-black",
+                              "w-full md:h-10 h-8 rounded-md md:rounded-lg flex items-center justify-center cursor-pointer transition-all border border-transparent text-[7px] md:text-[9px] font-black",
                               info ? `${pastelClass} shadow-sm border-white/50 active:scale-95` : "text-slate-100 flex items-center justify-center opacity-30 hover:opacity-100 hover:bg-slate-100"
                             )}
                           >
@@ -159,6 +166,7 @@ const Mosaic = () => {
             </table>
           </div>
         </div>
+
       </div>
 
       {/* Info Modal / Tooltip */}
