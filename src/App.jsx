@@ -11,6 +11,8 @@ import Subjects from './pages/Subjects';
 import PorteiroDashboard from './pages/PorteiroDashboard';
 import Users from './pages/Users';
 import WaitingApproval from './pages/WaitingApproval';
+import Distribution from './pages/Distribution';
+
 
 import Colaborador from './pages/Colaborador';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -83,7 +85,16 @@ function App() {
               </ProtectedRoute>
             } />
 
+            <Route path="/admin/distribution" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout>
+                  <Distribution />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
             <Route path="/admin/departments" element={
+
               <ProtectedRoute allowedRoles={['admin']}>
                 <DashboardLayout>
                   <Departments />

@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   Briefcase,
   BookOpen,
-  Users
+  Users,
+  Calendar
 } from 'lucide-react';
 import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
@@ -18,12 +19,14 @@ import { clsx } from 'clsx';
 const Sidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: Calendar, label: 'Distribuição', path: '/admin/distribution' },
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
     { icon: Users, label: 'Usuários', path: '/admin/users' },
     { icon: History, label: 'Relatórios', path: '/logs' },
   ];
+
 
 
   return (
