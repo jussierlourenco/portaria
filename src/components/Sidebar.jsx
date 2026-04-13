@@ -16,18 +16,25 @@ import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
 import { clsx } from 'clsx';
 
+import { useAuth } from '../hooks/useAuth';
+
 const Sidebar = () => {
+  const { role } = useAuth();
+
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: Calendar, label: 'Distribuição', path: '/admin/distribution' },
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
-    { icon: Users, label: 'Usuários', path: '/admin/users' },
-    { icon: History, label: 'Relatórios', path: '/logs' },
+    { icon: Users, label: 'Usuários', path: '/admin/users', roles: ['admin'] },
+    { icon: History, label: 'Relatórios', path: '/logs', roles: ['admin'] },
   ];
 
-
+  const filteredItems = menuItems.filter(item => {
+    if (!item.roles) return true;
+    return item.roles.includes(role);
+  });
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-50">
@@ -44,7 +51,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => (
+        {filteredItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -60,6 +67,7 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
+
 
       <div className="p-4 border-t border-slate-50">
         <button 

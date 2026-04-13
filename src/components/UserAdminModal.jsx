@@ -94,8 +94,10 @@ const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
                       className="w-full pl-12 pr-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-brand-primary/5 outline-none transition-all font-bold text-slate-600 appearance-none"
                     >
                       <option value="porteiro">Porteiro</option>
+                      <option value="gestor">Gestor</option>
                       <option value="admin">Admin</option>
                     </select>
+
                   </div>
                 </div>
 

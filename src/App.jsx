@@ -70,12 +70,13 @@ function App() {
             } />
 
             <Route path="/admin" element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
                 <DashboardLayout>
                   <Admin />
                 </DashboardLayout>
               </ProtectedRoute>
             } />
+
 
             <Route path="/admin/users" element={
               <ProtectedRoute allowedRoles={['admin']}>
@@ -86,29 +87,31 @@ function App() {
             } />
 
             <Route path="/admin/distribution" element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
                 <DashboardLayout>
                   <Distribution />
                 </DashboardLayout>
               </ProtectedRoute>
             } />
 
-            <Route path="/admin/departments" element={
 
-              <ProtectedRoute allowedRoles={['admin']}>
+            <Route path="/admin/departments" element={
+              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
                 <DashboardLayout>
                   <Departments />
                 </DashboardLayout>
               </ProtectedRoute>
             } />
 
+
             <Route path="/admin/subjects" element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
                 <DashboardLayout>
                   <Subjects />
                 </DashboardLayout>
               </ProtectedRoute>
             } />
+
 
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
