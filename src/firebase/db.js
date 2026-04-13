@@ -64,6 +64,49 @@ export const syncDepartments = async (deptsData) => {
   await Promise.all(addPromises);
 };
 
+// --- Subjects (Disciplinas) ---
+
+export const subscribeToSubjects = (callback) => {
+  const q = query(collection(db, 'subjects'), orderBy('name', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(subjects);
+  });
+};
+
+export const addSubject = async (subjectData) => {
+  await addDoc(collection(db, 'subjects'), {
+    ...subjectData,
+    createdAt: serverTimestamp()
+  });
+};
+
+export const updateSubject = async (subjectId, subjectData) => {
+  const subjectRef = doc(db, 'subjects', subjectId);
+  await updateDoc(subjectRef, {
+    ...subjectData,
+    updatedAt: serverTimestamp()
+  });
+};
+
+export const deleteSubject = async (subjectId) => {
+  const subjectRef = doc(db, 'subjects', subjectId);
+  await deleteDoc(subjectRef);
+};
+
+export const syncSubjects = async (subjectsData) => {
+  const subjectsCol = collection(db, 'subjects');
+  const snapshot = await getDocs(subjectsCol);
+  const deletePromises = snapshot.docs.map(docSnapshot => deleteDoc(doc(db, 'subjects', docSnapshot.id)));
+  await Promise.all(deletePromises);
+
+  const addPromises = subjectsData.map(subject => addDoc(subjectsCol, {
+    ...subject,
+    createdAt: serverTimestamp()
+  }));
+  await Promise.all(addPromises);
+};
+
 
 // Check-in (Open Room)
 export const roomCheckIn = async (roomId, userId) => {

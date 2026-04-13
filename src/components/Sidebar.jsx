@@ -7,7 +7,8 @@ import {
   LogOut, 
   History,
   ShieldCheck,
-  Briefcase
+  Briefcase,
+  BookOpen
 } from 'lucide-react';
 import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
@@ -18,6 +19,7 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
+    { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
     { icon: History, label: 'Relatórios', path: '/logs' },
   ];
 

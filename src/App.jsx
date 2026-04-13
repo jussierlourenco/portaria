@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Departments from './pages/Departments';
+import Subjects from './pages/Subjects';
 import Colaborador from './pages/Colaborador';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -59,6 +60,14 @@ function App() {
               <ProtectedRoute allowedRoles={['admin']}>
                 <DashboardLayout>
                   <Departments />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/subjects" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout>
+                  <Subjects />
                 </DashboardLayout>
               </ProtectedRoute>
             } />

@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogIn, LogOut, Clock, MapPin, BookOpen } from 'lucide-react';
 import { clsx } from 'clsx';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
+import { subscribeToSubjects } from '../firebase/db';
 
 const RoomCard = ({ room, onAction }) => {
+  const [subjects, setSubjects] = useState([]);
+  
+  useEffect(() => {
+    const unsubscribe = subscribeToSubjects(setSubjects);
+    return () => unsubscribe();
+  }, []);
+
+  const subjectMap = Object.fromEntries(subjects.map(s => [s.code, s.name]));
   const isClosed = room.status === 'Fechada' || !room.status;
-  const scheduleStatus = getRoomScheduleStatus(room.schedule);
+  const { isOccupied, currentEvent, nextEvent, nextEventTime } = getRoomScheduleStatus(room.schedule);
   
   return (
     <div className="glass-card p-5 hover:shadow-2xl transition-all cursor-pointer group flex flex-col justify-between h-full">
@@ -26,7 +35,7 @@ const RoomCard = ({ room, onAction }) => {
           )}>
             {room.status || 'Pendente'}
           </span>
-          {scheduleStatus.isOccupied && (
+          {isOccupied && (
             <span className="flex items-center gap-1 px-3 py-1 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-tighter rounded-full border border-brand-primary/20 animate-pulse">
               <BookOpen size={10} />
               Em Aula
@@ -39,14 +48,16 @@ const RoomCard = ({ room, onAction }) => {
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Clock size={16} className="text-brand-primary" />
           <span className="font-bold">
-            {scheduleStatus.isOccupied ? 'Aula Atual:' : 'Próximo Evento:'}
+            {isOccupied ? 'Aula Atual:' : 'Próximo Evento:'}
           </span>
         </div>
         <p className="text-sm text-slate-700 mt-1 pl-6 line-clamp-1 font-medium">
-          {scheduleStatus.isOccupied ? scheduleStatus.currentClass : (scheduleStatus.nextClass || 'Sem aulas agendadas')}
+          {isOccupied 
+            ? (subjectMap[currentEvent] || currentEvent || 'Aula em curso') 
+            : (subjectMap[nextEvent] || nextEvent || 'Sem aulas agendadas')}
         </p>
         <p className="text-xs text-slate-400 pl-6 font-bold">
-          {scheduleStatus.isOccupied ? 'Agora' : (scheduleStatus.nextStartTime || '--:--')}
+          {isOccupied ? 'Agora' : (nextEventTime || '--:--')}
         </p>
       </div>
 
