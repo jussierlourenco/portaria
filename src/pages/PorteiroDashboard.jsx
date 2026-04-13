@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { auth } from '../firebase/config';
 import { subscribeToRooms, roomCheckIn, roomCheckOut, logRoomInspection } from '../firebase/db';
 import { signOut } from 'firebase/auth'; 
-import ChecklistModal from '../components/ChecklistModal';
+
 import QRScannerModal from '../components/QRScannerModal';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock, Camera, Navigation } from 'lucide-react';
