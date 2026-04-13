@@ -6,8 +6,8 @@ const Admin = () => {
     <div className="min-h-screen bg-slate-50 p-6 md:p-10">
       <header className="mb-10 flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic">Administração</h1>
-          <p className="text-slate-500 font-medium">Controle total do ClassControl</p>
+          <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic">Administração</h1>
+          <p className="text-slate-500 font-medium">Controle total do PORTARIA-CB</p>
         </div>
         <button className="btn-primary flex items-center gap-2">
           <Plus size={20} />
@@ -17,7 +17,7 @@ const Admin = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
         {[
-          { label: 'Salas Ativas', value: '42', icon: Database, color: 'text-indigo-600' },
+          { label: 'Salas Ativas', value: '42', icon: Database, color: 'text-brand-primary' },
           { label: 'Bedéis', value: '12', icon: Users, color: 'text-emerald-600' },
           { label: 'Economia (Mês)', value: '14%', icon: BarChart3, color: 'text-amber-600' },
           { label: 'Uso Médio', value: '8.5h/dia', icon: BarChart3, color: 'text-blue-600' },
@@ -37,7 +37,7 @@ const Admin = () => {
       <div className="glass-card overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
           <h2 className="text-lg font-black text-slate-800 uppercase tracking-tight">Listagem de Salas</h2>
-          <button className="text-sm font-bold text-indigo-600 hover:underline">Exportar Relatório</button>
+          <button className="text-sm font-bold text-brand-primary hover:underline">Exportar Relatório</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -66,7 +66,7 @@ const Admin = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">{row.last}</td>
                   <td className="px-6 py-4">
-                    <button className="text-indigo-600 font-bold text-sm hover:underline">Editar</button>
+                    <button className="text-brand-primary font-bold text-sm hover:underline">Editar</button>
                   </td>
                 </tr>
               ))}

@@ -47,9 +47,16 @@ const Dashboard = () => {
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Top Navbar */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-xl font-black text-indigo-600 tracking-tighter uppercase">ClassControl</h1>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Painel do Inspetor</p>
+        <div className="flex items-center gap-3">
+          <img 
+            src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
+            alt="Logo CB" 
+            className="h-10 drop-shadow-sm"
+          />
+          <div>
+            <h1 className="text-xl font-black text-brand-primary tracking-tighter uppercase">PORTARIA-CB</h1>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Painel do Inspetor</p>
+          </div>
         </div>
         <button 
           onClick={() => signOut(auth)}
@@ -68,14 +75,14 @@ const Dashboard = () => {
               <p className="text-slate-500 font-medium">Você tem {rooms.filter(r => r.status !== 'Fechada').length} salas pendentes hoje.</p>
             </div>
             
-            <div className="glass-card p-5 md:w-80 shadow-indigo-100">
+            <div className="glass-card p-5 md:w-80 shadow-brand-primary/5">
                <div className="flex justify-between items-center mb-3">
                 <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Ronda do Dia</span>
-                <span className="text-sm font-black text-indigo-600">{progress}%</span>
+                <span className="text-sm font-black text-brand-primary">{progress}%</span>
               </div>
               <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-1000 ease-out" 
+                  className="h-full bg-gradient-to-r from-brand-primary to-brand-secondary transition-all duration-1000 ease-out" 
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -92,7 +99,7 @@ const Dashboard = () => {
               placeholder="Buscar sala pelo nome..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:border-indigo-300 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-100 focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/5 outline-none transition-all"
             />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
@@ -102,7 +109,7 @@ const Dashboard = () => {
                 onClick={() => setFilter(b)}
                 className={clsx(
                   "px-6 py-4 rounded-2xl font-bold whitespace-nowrap transition-all",
-                  filter === b ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-white text-slate-500 border border-slate-100 hover:bg-slate-50"
+                  filter === b ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" : "bg-white text-slate-500 border border-slate-100 hover:bg-slate-50"
                 )}
               >
                 {b}

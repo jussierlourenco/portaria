@@ -28,10 +28,15 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-      <div className="glass-card p-8 w-full max-w-md shadow-2xl shadow-indigo-100">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-indigo-600 tracking-tighter uppercase italic">ClassControl</h1>
-          <p className="text-slate-500 font-medium">Gestão inteligente de salas</p>
+      <div className="glass-card p-10 w-full max-w-md shadow-2xl shadow-brand-primary/10 border-white/40">
+        <div className="text-center mb-10">
+          <img 
+            src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
+            alt="Logo CB" 
+            className="h-20 mx-auto mb-4 drop-shadow-sm"
+          />
+          <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">PORTARIA-CB</h1>
+          <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Sistema de Ronda</p>
         </div>
         
         {error && (
@@ -48,8 +53,8 @@ const Login = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="exemplo@sistema.com" 
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-indigo-300 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-medium" 
+              placeholder="exemplo@ufrn.br" 
+              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/5 outline-none transition-all font-medium" 
             />
           </div>
           <div>
@@ -60,7 +65,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••" 
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-indigo-300 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-medium" 
+              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/5 outline-none transition-all font-medium" 
             />
           </div>
           
@@ -74,7 +79,7 @@ const Login = () => {
         </form>
 
         <p className="mt-8 text-center text-xs text-slate-400 font-medium">
-          Dificuldade no acesso? <span className="text-indigo-500 cursor-pointer hover:underline">Contate o administrador</span>
+          Dificuldade no acesso? <span className="text-brand-primary cursor-pointer hover:underline">Contate o administrador</span>
         </p>
       </div>
     </div>

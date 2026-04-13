@@ -20,8 +20,13 @@ const Colaborador = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <header className="mb-10 text-center">
-        <h1 className="text-3xl font-black text-indigo-600 tracking-tighter uppercase italic">ClassControl</h1>
-        <p className="text-slate-500 font-medium">Consulta Rápida de Disponibilidade</p>
+        <img 
+          src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
+          alt="Logo CB" 
+          className="h-16 mx-auto mb-4 drop-shadow-sm"
+        />
+        <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">PORTARIA-CB</h1>
+        <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Consulta de Disponibilidade</p>
       </header>
 
       <div className="max-w-4xl mx-auto">
@@ -32,7 +37,7 @@ const Colaborador = () => {
             placeholder="Buscar sala ou bloco..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-5 rounded-3xl bg-white shadow-xl shadow-indigo-50 border-none focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-lg font-medium"
+            className="w-full pl-12 pr-4 py-5 rounded-3xl bg-white shadow-xl shadow-brand-primary/5 border-none focus:ring-4 focus:ring-brand-primary/10 outline-none transition-all text-lg font-medium"
           />
         </div>
 

@@ -55,7 +55,7 @@ const RoomModal = ({ room, isOpen, onClose, onConfirm }) => {
 
             <div className="mb-8">
               <p className="text-slate-500 font-medium">Sala:</p>
-              <h3 className="text-xl font-bold text-indigo-600">{room.name}</h3>
+              <h3 className="text-xl font-bold text-brand-primary">{room.name}</h3>
               <p className="text-sm text-slate-400">{room.block} • {room.pavilion}</p>
             </div>
 
@@ -96,7 +96,7 @@ const RoomModal = ({ room, isOpen, onClose, onConfirm }) => {
                 "w-full py-4 rounded-2xl font-black text-lg transition-all shadow-lg active:scale-95 mb-2",
                 isCheckout 
                   ? (Object.values(checklist).every(v => v) ? "bg-emerald-600 text-white shadow-emerald-200" : "bg-slate-200 text-slate-400 cursor-not-allowed")
-                  : "bg-indigo-600 text-white shadow-indigo-200"
+                  : "bg-brand-primary text-white shadow-brand-primary/20"
               )}
               disabled={isCheckout && !Object.values(checklist).every(v => v)}
             >

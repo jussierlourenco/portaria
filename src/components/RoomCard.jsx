@@ -10,7 +10,7 @@ const RoomCard = ({ room, onAction }) => {
       <div className="flex justify-between items-start mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <MapPin size={14} className="text-indigo-400" />
+            <MapPin size={14} className="text-brand-primary/60" />
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-tighter">
               {room.block} • {room.pavilion}
             </p>
@@ -27,7 +27,7 @@ const RoomCard = ({ room, onAction }) => {
 
       <div className="bg-slate-50/50 rounded-xl p-3 mb-6 border border-slate-100">
         <div className="flex items-center gap-2 text-sm text-slate-600">
-          <Clock size={16} className="text-indigo-500" />
+          <Clock size={16} className="text-brand-primary" />
           <span className="font-bold">Próximo Evento:</span>
         </div>
         <p className="text-sm text-slate-700 mt-1 pl-6">
@@ -46,7 +46,7 @@ const RoomCard = ({ room, onAction }) => {
         className={clsx(
           "w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 active:scale-95",
           isClosed 
-            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700" 
+            ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20 hover:bg-brand-primary/90" 
             : "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100"
         )}
       >
