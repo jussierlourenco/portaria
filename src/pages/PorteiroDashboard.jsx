@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { auth } from '../firebase/config';
 import { subscribeToRooms, roomCheckIn, roomCheckOut, logRoomInspection } from '../firebase/db';
@@ -10,15 +10,14 @@ import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock, Camera, Navi
 import { clsx } from 'clsx';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
-
 const PorteiroDashboard = () => {
+
   const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isAlarmEnabled, setIsAlarmEnabled] = useState(false);
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scanMessage, setScanMessage] = useState(null);
-
 
   const handleLogout = async () => {
     try {
@@ -29,7 +28,7 @@ const PorteiroDashboard = () => {
     }
   };
 
-  const handleScanSuccess = async (data) => {
+  const handleScanSuccess = useCallback(async (data) => {
     try {
       await logRoomInspection(data.id, user.uid);
       setScanMessage({ type: 'success', text: `Vistoria confirmada: ${data.name}` });
@@ -38,7 +37,8 @@ const PorteiroDashboard = () => {
     } catch (e) {
       setScanMessage({ type: 'error', text: 'Erro ao registrar: ' + e.message });
     }
-  };
+  }, [user.uid]);
+
 
   const playAlarm = () => {
 

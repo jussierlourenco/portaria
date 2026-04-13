@@ -5,16 +5,14 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
   const [error, setError] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
+  const [isScanning, setIsScanning] = useState(true);
 
   useEffect(() => {
     let html5QrCode;
 
     if (isOpen) {
-      setError(null);
-      setIsScanning(true);
-      
       // Pequeno delay para garantir que o container DOM esteja pronto
+
       const timer = setTimeout(() => {
         html5QrCode = new Html5Qrcode("reader");
         
@@ -35,13 +33,14 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
               } else {
                 setError('QR Code inválido para este sistema.');
               }
-            } catch (e) {
+            } catch {
               setError('Formato de QR Code não reconhecido.');
             }
           },
-          (errorMessage) => {
+          () => {
             // Erros silenciosos de "não encontrado no frame"
           }
+
         ).catch(err => {
           console.error(err);
           setError('Não foi possível acessar a câmera. Verifique as permissões.');
@@ -56,7 +55,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
         }
       };
     }
-  }, [isOpen]);
+  }, [isOpen, onScanSuccess]);
+
 
   if (!isOpen) return null;
 
