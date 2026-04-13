@@ -17,6 +17,7 @@ import Mosaic from './pages/Mosaic';
 
 
 import Colaborador from './pages/Colaborador';
+import Reports from './pages/Reports';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -137,7 +138,18 @@ function App() {
             } />
 
 
+
+            <Route path="/admin/reports" element={
+              <ProtectedRoute allowedRoles={['admin', 'gestor']}>
+                <DashboardLayout>
+                  <Reports />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
+
             <Route path="*" element={<Navigate to="/" />} />
+
           </Routes>
         </div>
       </AuthProvider>

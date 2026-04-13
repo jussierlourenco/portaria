@@ -33,7 +33,7 @@ const Sidebar = () => {
     { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: BookOpen, label: 'Disciplinas', path: '/admin/subjects' },
     { icon: Users, label: 'Usuários', path: '/admin/users', roles: ['admin'] },
-    { icon: History, label: 'Relatórios', path: '/logs', roles: ['admin'] },
+    {icon: History, label: 'Relatórios', path: '/admin/reports', roles: ['admin', 'gestor'] },
   ];
 
   const filteredItems = menuItems.filter(item => {
