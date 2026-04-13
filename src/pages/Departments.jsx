@@ -45,11 +45,11 @@ const Departments = () => {
   };
 
   const handleSync = async () => {
-    if (!window.confirm('Isso irá substituir os departamentos atuais pelos dados do arquivo SALAS.csv. Deseja continuar?')) return;
+    if (!window.confirm('Isso irá substituir os departamentos atuais pelos dados do arquivo DEPTO.csv. Deseja continuar?')) return;
     
     setIsSyncing(true);
     try {
-      const response = await fetch('/SALAS.csv');
+      const response = await fetch('/DEPTO.csv');
       const csvContent = await response.text();
       const deptsData = parseDepartmentsCSV(csvContent);
       
@@ -62,6 +62,7 @@ const Departments = () => {
       setIsSyncing(false);
     }
   };
+
 
   return (
     <div className="space-y-10">

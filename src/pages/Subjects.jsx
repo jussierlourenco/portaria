@@ -61,11 +61,11 @@ const Subjects = () => {
   };
 
   const handleSync = async () => {
-    if (!window.confirm('Isso irá substituir as disciplinas atuais pelos dados do arquivo DEPTO.csv. Deseja continuar?')) return;
+    if (!window.confirm('Isso irá substituir as disciplinas atuais pelos dados do arquivo DISCIPLINA.csv. Deseja continuar?')) return;
     
     setIsSyncing(true);
     try {
-      const response = await fetch('/DEPTO.csv');
+      const response = await fetch('/DISCIPLINA.csv');
       const csvContent = await response.text();
       const subjectsData = parseSubjectsCSV(csvContent, departments);
       
@@ -78,6 +78,7 @@ const Subjects = () => {
       setIsSyncing(false);
     }
   };
+
 
   const filteredSubjects = subjects.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
