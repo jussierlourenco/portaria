@@ -67,12 +67,21 @@ export const syncDepartments = async (deptsData) => {
 // --- Subjects (Disciplinas) ---
 
 export const subscribeToSubjects = (callback) => {
-  const q = query(collection(db, 'subjects'), orderBy('name', 'asc'));
-  return onSnapshot(q, (snapshot) => {
+  // Removido o orderBy temporariamente para debugar se o problema é o campo 'name' ou índice
+  const subjectsCol = collection(db, 'subjects');
+  return onSnapshot(subjectsCol, (snapshot) => {
+    const subjectsCount = snapshot.size;
+    console.log('Firestore: Coleção "subjects" retornou', subjectsCount, 'documentos');
+    
+    if (subjectsCount > 0) {
+      console.log('Exemplo de campos do primeiro documento:', Object.keys(snapshot.docs[0].data()));
+    }
+
     const subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     callback(subjects);
   });
 };
+
 
 export const addSubject = async (subjectData) => {
   await addDoc(collection(db, 'subjects'), {

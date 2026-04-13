@@ -1,39 +1,46 @@
-/**
- * Parser para extrair disciplinas do arquivo DEPTO.csv
- * O arquivo segue uma estrutura de cabeçalhos por departamento e depois linhas com COD,NOME...
- */
-
 export const parseSubjectsCSV = (csvContent, departments = []) => {
-  const lines = csvContent.split('\n');
+  // Remove BOM se existir e normaliza quebras de linha
+  const cleanContent = csvContent.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+  const lines = cleanContent.split('\n');
   const subjects = [];
   
-  // Mapa para busca rápida de departamento por nome ou sigla
+  console.log('Iniciando parsing de CSV. Total de linhas:', lines.length);
+
+  // Mapa para busca rápida de departamento
   const deptLookup = {};
   departments.forEach(d => {
     deptLookup[d.name.toLowerCase().trim()] = d.id;
     deptLookup[d.sigla.toLowerCase().trim()] = d.id;
-    // Adiciona variações comuns se necessário
-    if (d.name.includes(',')) {
-       const parts = d.name.split(',').map(p => p.trim().toLowerCase());
-       parts.forEach(p => { deptLookup[p] = d.id; });
-    }
   });
 
-  // Pula a primeira linha (cabeçalhos)
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // Split robusto para lidar com aspas (ex: "DEPT. BOTÂNICA, ...")
-    const columns = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^)/g) || [];
-    const cleanColumns = columns.map(c => c.replace(/^"|"$/g, '').trim());
+    // Split mais resiliente para CSV
+    const columns = [];
+    let current = '';
+    let inQuotes = false;
     
-    // Novas colunas: COD[0], DISCIPLINA[1], DEPARTAMENTO[2], CRD[3], T[4], CAP[5], HORÁRIO[6], LOCAL[7]
-    const code = cleanColumns[0];
-    const name = cleanColumns[1];
-    const deptNameRaw = cleanColumns[2];
+    for (let char of line) {
+      if (char === '"') inQuotes = !inQuotes;
+      else if (char === ',' && !inQuotes) {
+        columns.push(current.trim().replace(/^"|"$/g, ''));
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    columns.push(current.trim().replace(/^"|"$/g, ''));
 
-    if (code && name && code.match(/^[A-Z]{3}[0-9]{4}$/)) {
+    const code = columns[0];
+    const name = columns[1];
+    const deptNameRaw = columns[2];
+
+    // Debug para a primeira linha de dados
+    if (i === 1) console.log('DEBUG Primeira Linha:', { code, name, deptNameRaw, columnsCount: columns.length });
+
+    if (code && name && code.length >= 6) {
       // Tenta encontrar o departamento
       let deptId = null;
       if (deptNameRaw) {
@@ -41,24 +48,23 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
         deptId = deptLookup[cleanDeptName] || deptLookup[deptNameRaw.toLowerCase()] || null;
       }
       
-      // Fallback pela sigla do código
       if (!deptId) {
         const sigla = code.substring(0, 3).toLowerCase();
         deptId = deptLookup[sigla] || null;
       }
 
       subjects.push({
-        code,
-        name,
+        code: code.toUpperCase(),
+        name: name,
         departmentId: deptId,
-        credits: cleanColumns[3] || '',
-        capacity: cleanColumns[5] || '',
+        credits: columns[3] || '',
+        capacity: columns[5] || '',
         fullLine: line
       });
     }
   }
 
-  // Remove duplicatas por código
+  // Remove duplicatas
   const uniqueSubjects = [];
   const seenCodes = new Set();
   
@@ -69,6 +75,8 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
     }
   });
 
+  console.log('Parsing concluído. Válidos:', uniqueSubjects.length);
   return uniqueSubjects;
 };
+
 
