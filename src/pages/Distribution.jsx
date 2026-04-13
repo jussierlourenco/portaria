@@ -190,8 +190,9 @@ const Distribution = () => {
                 </tr>
               </thead>
               <tbody>
-                {SCHEDULE_SLOTS.map((slot, rowIndex) => (
+                {SCHEDULE_SLOTS.map((slot) => (
                   <tr key={slot} className="group hover:bg-slate-50/30 transition-colors">
+
                     <td className="p-4 border-r border-b border-slate-100 bg-slate-50/20">
                       <span className="text-[10px] font-black text-slate-500">{slot}</span>
                     </td>
