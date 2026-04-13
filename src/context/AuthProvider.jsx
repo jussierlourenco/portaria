@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
 
 export const AuthProvider = ({ children }) => {
@@ -13,12 +13,20 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Fetch user role from Firestore
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        const userDoc = await getDoc(userRef);
+        
         if (userDoc.exists()) {
           setRole(userDoc.data().role);
         } else {
-          // Default role if not found (e.g., 'colaborador' for new self-registered users if allowed)
-          setRole('colaborador');
+          // Se o usuário não existe no Firestore, criamos como 'admin' para permitir o setup inicial
+          const initialRole = 'admin';
+          await setDoc(userRef, {
+            email: firebaseUser.email,
+            role: initialRole,
+            createdAt: new Date()
+          });
+          setRole(initialRole);
         }
         setUser(firebaseUser);
       } else {
