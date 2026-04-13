@@ -208,3 +208,9 @@ export const updateUserData = async (userId, data) => {
   });
 };
 
+export const deleteUser = async (userId) => {
+  const userRef = doc(db, 'users', userId);
+  await deleteDoc(userRef);
+};
+
+
