@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { auth, subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
+import { auth } from '../firebase/config';
+import { subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
 import { signOut } from 'firebase/auth'; // Import direto para maior segurança
+
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
