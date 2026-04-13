@@ -19,15 +19,13 @@ const Reports = () => {
   const [rooms, setRooms] = useState([]);
   const [selectedDay, setSelectedDay] = useState('seg');
   const [filterBlock, setFilterBlock] = useState('Todos');
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     const unsub = subscribeToRooms((data) => {
       setRooms(data);
-      setIsLoading(false);
     });
     return () => unsub();
   }, []);
+
 
   // Coletar blocos únicos para o filtro
   const blocks = ['Todos', ...new Set(rooms.map(r => r.block))].sort();
