@@ -9,12 +9,14 @@ import Admin from './pages/Admin';
 import Departments from './pages/Departments';
 import Subjects from './pages/Subjects';
 import PorteiroDashboard from './pages/PorteiroDashboard';
+import Users from './pages/Users';
+import WaitingApproval from './pages/WaitingApproval';
 
 import Colaborador from './pages/Colaborador';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, role, loading } = useAuth();
+  const { user, role, status, loading } = useAuth();
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -24,6 +26,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (!user) return <Navigate to="/login" />;
   
+  if (status === 'pending' || status === 'blocked') {
+    return <WaitingApproval />;
+  }
+  
   if (allowedRoles && !allowedRoles.includes(role)) {
     return <Navigate to="/" />;
   }
@@ -32,7 +38,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 const AppContent = () => {
-
   const { role } = useAuth();
   
   if (role === 'porteiro') {
@@ -66,6 +71,14 @@ function App() {
               <ProtectedRoute allowedRoles={['admin']}>
                 <DashboardLayout>
                   <Admin />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/users" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout>
+                  <Users />
                 </DashboardLayout>
               </ProtectedRoute>
             } />

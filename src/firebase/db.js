@@ -189,3 +189,22 @@ export const deleteRoom = async (roomId) => {
   const roomRef = doc(db, 'rooms', roomId);
   await deleteDoc(roomRef);
 };
+
+// --- User Management ---
+
+export const subscribeToUsers = (callback) => {
+  const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(users);
+  });
+};
+
+export const updateUserData = async (userId, data) => {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, {
+    ...data,
+    updatedAt: serverTimestamp()
+  });
+};
+
