@@ -1,34 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+
 import { X, Shield, Mail, User, CheckCircle2 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const UserAdminModal = ({ isOpen, onClose, onSave, user }) => {
   const [formData, setFormData] = useState({
-    displayName: '',
-    email: '',
-    role: 'porteiro',
-    status: 'active'
+    displayName: user?.displayName || '',
+    email: user?.email || '',
+    role: user?.role || 'porteiro',
+    status: user?.status || 'active'
   });
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        displayName: user.displayName || '',
-        email: user.email || '',
-        role: user.role || 'porteiro',
-        status: user.status || 'active'
-      });
-    } else {
-      setFormData({
-        displayName: '',
-        email: '',
-        role: 'porteiro',
-        status: 'active'
-      });
-    }
-  }, [user, isOpen]);
-
   if (!isOpen) return null;
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -68,14 +68,6 @@ const Users = () => {
     }
   };
 
-  const handleRoleChange = async (userId, newRole) => {
-    try {
-      await updateUserData(userId, { role: newRole });
-    } catch (e) {
-      alert('Erro ao atualizar cargo: ' + e.message);
-    }
-  };
-
   const filteredUsers = users.filter(u => {
     if (filter === 'all') return true;
     if (filter === 'pending') return u.status === 'pending';
@@ -240,11 +232,13 @@ const Users = () => {
       </div>
 
       <UserAdminModal 
+        key={selectedUser?.id || 'new'}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUser}
         user={selectedUser}
       />
+
     </div>
   );
 };
