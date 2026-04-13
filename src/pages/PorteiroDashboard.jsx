@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { auth } from '../firebase/config';
-import { subscribeToRooms, roomCheckIn, roomCheckOut } from '../firebase/db';
-import { signOut } from 'firebase/auth'; // Import direto para maior segurança
-
+import { subscribeToRooms, roomCheckIn, roomCheckOut, logRoomInspection } from '../firebase/db';
+import { signOut } from 'firebase/auth'; 
+import ChecklistModal from '../components/ChecklistModal';
+import QRScannerModal from '../components/QRScannerModal';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
-import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
+import { LogOut, Bell, BellOff, CheckCircle2, AlertTriangle, Clock, Camera, Navigation } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+
 
 const PorteiroDashboard = () => {
   const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isAlarmEnabled, setIsAlarmEnabled] = useState(false);
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scanMessage, setScanMessage] = useState(null);
+
 
   const handleLogout = async () => {
     try {
@@ -24,7 +29,19 @@ const PorteiroDashboard = () => {
     }
   };
 
+  const handleScanSuccess = async (data) => {
+    try {
+      await logRoomInspection(data.id, user.uid);
+      setScanMessage({ type: 'success', text: `Vistoria confirmada: ${data.name}` });
+      setIsScannerOpen(false);
+      setTimeout(() => setScanMessage(null), 4000);
+    } catch (e) {
+      setScanMessage({ type: 'error', text: 'Erro ao registrar: ' + e.message });
+    }
+  };
+
   const playAlarm = () => {
+
     try {
       const context = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = context.createOscillator();
@@ -128,7 +145,19 @@ const PorteiroDashboard = () => {
         </div>
       </header>
 
+      {/* Botão Flutuante de Ronda (Fixo no rodapé para mobile) */}
+      <div className="fixed bottom-24 right-6 z-40">
+         <button 
+          onClick={() => setIsScannerOpen(true)}
+          className="flex items-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all border border-slate-700"
+         >
+            <Camera size={16} className="text-brand-primary" />
+            Ronda QR
+         </button>
+      </div>
+
       <main className="flex-1 p-4 -mt-4 space-y-6">
+
         {/* Alerta de Modo de Uso */}
         {!isAlarmEnabled && (
           <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-3 text-amber-700">
@@ -209,9 +238,12 @@ const PorteiroDashboard = () => {
 
       {/* Footer Nav */}
       <footer className="bg-white border-t border-slate-100 p-4 pb-8 flex justify-around items-center sticky bottom-0 z-50">
-        <button className="flex flex-col items-center gap-1 text-brand-primary">
-          <Clock size={24} />
-          <span className="text-[10px] font-black uppercase">Ronda</span>
+        <button 
+          onClick={() => setIsScannerOpen(true)}
+          className="flex flex-col items-center gap-1 text-brand-primary"
+        >
+          <Camera size={24} />
+          <span className="text-[10px] font-black uppercase">Ronda QR</span>
         </button>
         <button 
           onClick={handleLogout}
@@ -220,10 +252,34 @@ const PorteiroDashboard = () => {
           <LogOut size={24} />
           <span className="text-[10px] font-black uppercase">Sair</span>
         </button>
-
       </footer>
+
+      <QRScannerModal 
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScanSuccess={handleScanSuccess}
+      />
+
+      {/* Toast de Confirmação de Scan */}
+      <AnimatePresence>
+        {scanMessage && (
+          <Motion.div 
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 50, x: '-50%' }}
+            className={clsx(
+              "fixed bottom-28 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full shadow-2xl font-black uppercase text-[10px] tracking-widest z-[150] flex items-center gap-3 border min-w-[280px] justify-center",
+              scanMessage.type === 'success' ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-rose-500 text-white border-rose-400'
+            )}
+          >
+            {scanMessage.type === 'success' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+            {scanMessage.text}
+          </Motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
 
 export default PorteiroDashboard;

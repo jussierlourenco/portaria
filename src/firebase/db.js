@@ -171,7 +171,19 @@ export const roomCheckOut = async (roomId, userId, checklist) => {
   });
 };
 
+// Log room inspection (QR Code)
+export const logRoomInspection = async (roomId, userId) => {
+  await addDoc(collection(db, 'logs'), {
+    roomId,
+    type: 'inspection',
+    userId,
+    timestamp: serverTimestamp(),
+  });
+};
+
 // --- Room Management (CRUD) ---
+
+
 
 // Sincronizar todas as salas (Limpa e Re-adiciona)
 export const syncRooms = async (roomsData) => {

@@ -2,16 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Users, BarChart3, Database, Trash2, Edit3 } from 'lucide-react';
 import { subscribeToRooms, subscribeToDepartments, addRoom, updateRoom, deleteRoom, syncRooms } from '../firebase/db';
 import RoomAdminModal from '../components/RoomAdminModal';
+import RoomQRCodeModal from '../components/RoomQRCodeModal';
 import { parseRoomsCSV } from '../utils/csvParser';
 import { parseRoomsMetadataCSV } from '../utils/roomMetadataParser';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
+import { QrCode } from 'lucide-react';
+
 
 const Admin = () => {
   const [rooms, setRooms] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
+  const [qrRoom, setQrRoom] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
+
 
   useEffect(() => {
     const unsubscribeRooms = subscribeToRooms(setRooms);
@@ -195,11 +200,19 @@ const Admin = () => {
                   <td className="px-6 py-5">
                     <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
+                        onClick={() => setQrRoom(room)}
+                        className="p-2 text-slate-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-colors"
+                        title="Gerar QR Code"
+                      >
+                        <QrCode size={18} />
+                      </button>
+                      <button 
                         onClick={() => handleEdit(room)}
                         className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-colors"
                       >
                         <Edit3 size={18} />
                       </button>
+
                       <button 
                         onClick={() => handleDelete(room.id)}
                         className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
@@ -229,7 +242,14 @@ const Admin = () => {
         onSave={handleSave}
         room={editingRoom}
       />
+
+      <RoomQRCodeModal 
+        isOpen={!!qrRoom}
+        onClose={() => setQrRoom(null)}
+        room={qrRoom}
+      />
     </div>
+
   );
 };
 
