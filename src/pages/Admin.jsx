@@ -7,7 +7,7 @@ const Admin = () => {
       <header className="mb-10 flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-black text-brand-primary tracking-tighter uppercase italic">Administração</h1>
-          <p className="text-slate-500 font-medium">Controle total do PORTARIA-CB</p>
+          <p className="text-slate-500 font-medium">Controle total do Portaria CB</p>
         </div>
         <button className="btn-primary flex items-center gap-2">
           <Plus size={20} />

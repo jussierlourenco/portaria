@@ -35,8 +35,8 @@ const Login = () => {
             alt="Logo CB" 
             className="h-20 mx-auto mb-4 drop-shadow-sm"
           />
-          <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">PORTARIA-CB</h1>
-          <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Sistema de Ronda</p>
+          <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">Portaria CB</h1>
+          <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Gestão de Salas</p>
         </div>
         
         {error && (

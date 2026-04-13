@@ -54,7 +54,7 @@ const Dashboard = () => {
             className="h-10 drop-shadow-sm"
           />
           <div>
-            <h1 className="text-xl font-black text-brand-primary tracking-tighter uppercase">PORTARIA-CB</h1>
+            <h1 className="text-xl font-black text-brand-primary tracking-tighter uppercase">Portaria CB</h1>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Painel do Inspetor</p>
           </div>
         </div>

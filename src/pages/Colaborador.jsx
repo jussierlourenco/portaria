@@ -25,8 +25,8 @@ const Colaborador = () => {
           alt="Logo CB" 
           className="h-16 mx-auto mb-4 drop-shadow-sm"
         />
-        <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">PORTARIA-CB</h1>
-        <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Consulta de Disponibilidade</p>
+        <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">Portaria CB</h1>
+        <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Gestão de Salas</p>
       </header>
 
       <div className="max-w-4xl mx-auto">
