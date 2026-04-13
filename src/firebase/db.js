@@ -249,4 +249,15 @@ export const deleteUser = async (userId) => {
   await deleteDoc(userRef);
 };
 
+// --- Logs & Activity ---
+
+export const subscribeToLogs = (callback) => {
+  const q = query(collection(db, 'logs'), orderBy('timestamp', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(logs);
+  });
+};
+
+
 
