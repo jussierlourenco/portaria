@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { subscribeToDepartments } from '../firebase/db';
 
 const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
   const [formData, setFormData] = useState({
     name: room?.name || '',
     block: room?.block || 'Bloco A',
     pavilion: room?.pavilion || 'Térreo',
+    departmentId: room?.departmentId || '',
     nextEventTime: room?.nextEventTime || ''
   });
+
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToDepartments(setDepartments);
+    return () => unsubscribe();
+  }, []);
 
   // State is now refreshed via 'key' prop in parent Admin.jsx
 
@@ -86,6 +95,22 @@ const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
                     <option>3º Pavimento</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Departamento Responsável</label>
+                <select 
+                  value={formData.departmentId}
+                  onChange={(e) => setFormData({...formData, departmentId: e.target.value})}
+                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-brand-primary/30 outline-none transition-all font-medium appearance-none"
+                >
+                  <option value="">Selecione um departamento...</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      [{dept.sigla}] {dept.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

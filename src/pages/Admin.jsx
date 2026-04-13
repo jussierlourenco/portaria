@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Users, BarChart3, Database, Trash2, Edit3 } from 'lucide-react';
-import { subscribeToRooms, addRoom, updateRoom, deleteRoom, syncRooms } from '../firebase/db';
+import { subscribeToRooms, subscribeToDepartments, addRoom, updateRoom, deleteRoom, syncRooms } from '../firebase/db';
 import RoomAdminModal from '../components/RoomAdminModal';
 import { parseRoomsCSV } from '../utils/csvParser';
 import { getRoomScheduleStatus } from '../utils/scheduleLogic';
 
 const Admin = () => {
   const [rooms, setRooms] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = subscribeToRooms(setRooms);
-    return () => unsubscribe();
+    const unsubscribeRooms = subscribeToRooms(setRooms);
+    const unsubscribeDepts = subscribeToDepartments(setDepartments);
+    return () => {
+      unsubscribeRooms();
+      unsubscribeDepts();
+    };
   }, []);
+
+  const deptMap = Object.fromEntries(departments.map(d => [d.id, d.sigla]));
 
   const handleCreateNew = () => {
     setEditingRoom(null);
@@ -129,7 +136,14 @@ const Admin = () => {
               {rooms.map(room => (
                 <tr key={room.id} className="hover:bg-slate-50/30 transition-colors group">
                   <td className="px-8 py-5">
-                    <div className="font-bold text-slate-800">{room.name}</div>
+                    <div className="flex items-center gap-2">
+                       <div className="font-bold text-slate-800">{room.name}</div>
+                       {room.departmentId && (
+                         <span className="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-black uppercase">
+                           {deptMap[room.departmentId] || '...'}
+                         </span>
+                       )}
+                    </div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase">{room.block}</div>
                   </td>
                   <td className="px-6 py-5 font-medium text-slate-500">{room.pavilion || 'Não informado'}</td>

@@ -14,12 +14,56 @@ import {
 
 // Listen for updates on all rooms
 export const subscribeToRooms = (callback) => {
-  const q = query(collection(db, 'rooms'), orderBy('nextEventTime', 'asc'));
+  const q = query(collection(db, 'rooms'), orderBy('name', 'asc'));
   return onSnapshot(q, (snapshot) => {
     const rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     callback(rooms);
   });
 };
+
+// --- Departments ---
+
+export const subscribeToDepartments = (callback) => {
+  const q = query(collection(db, 'departments'), orderBy('name', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const depts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(depts);
+  });
+};
+
+export const addDepartment = async (deptData) => {
+  await addDoc(collection(db, 'departments'), {
+    ...deptData,
+    createdAt: serverTimestamp()
+  });
+};
+
+export const updateDepartment = async (deptId, deptData) => {
+  const deptRef = doc(db, 'departments', deptId);
+  await updateDoc(deptRef, {
+    ...deptData,
+    updatedAt: serverTimestamp()
+  });
+};
+
+export const deleteDepartment = async (deptId) => {
+  const deptRef = doc(db, 'departments', deptId);
+  await deleteDoc(deptRef);
+};
+
+export const syncDepartments = async (deptsData) => {
+  const deptsCol = collection(db, 'departments');
+  const snapshot = await getDocs(deptsCol);
+  const deletePromises = snapshot.docs.map(docSnapshot => deleteDoc(doc(db, 'departments', docSnapshot.id)));
+  await Promise.all(deletePromises);
+
+  const addPromises = deptsData.map(dept => addDoc(deptsCol, {
+    ...dept,
+    createdAt: serverTimestamp()
+  }));
+  await Promise.all(addPromises);
+};
+
 
 // Check-in (Open Room)
 export const roomCheckIn = async (roomId, userId) => {

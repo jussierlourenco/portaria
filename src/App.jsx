@@ -6,6 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import Departments from './pages/Departments';
 import Colaborador from './pages/Colaborador';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -50,6 +51,14 @@ function App() {
               <ProtectedRoute allowedRoles={['admin']}>
                 <DashboardLayout>
                   <Admin />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/departments" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout>
+                  <Departments />
                 </DashboardLayout>
               </ProtectedRoute>
             } />

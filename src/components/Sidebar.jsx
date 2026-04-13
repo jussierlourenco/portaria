@@ -6,7 +6,8 @@ import {
   Settings, 
   LogOut, 
   History,
-  ShieldCheck
+  ShieldCheck,
+  Briefcase
 } from 'lucide-react';
 import { auth } from '../firebase/config';
 import { signOut } from 'firebase/auth';
@@ -16,6 +17,7 @@ const Sidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: DoorOpen, label: 'Salas', path: '/admin' },
+    { icon: Briefcase, label: 'Departamentos', path: '/admin/departments' },
     { icon: History, label: 'Relatórios', path: '/logs' },
   ];
 
