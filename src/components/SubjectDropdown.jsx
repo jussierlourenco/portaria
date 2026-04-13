@@ -41,9 +41,18 @@ const SubjectDropdown = ({ isOpen, onClose, onSelect, currentSubjectCode }) => {
   const handleSync = async () => {
     setIsSyncing(true);
     try {
+      console.log('Iniciando busca do arquivo /DISCIPLINA.csv...');
       const response = await fetch('/DISCIPLINA.csv');
+      
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: Arquivo /DISCIPLINA.csv não encontrado no servidor.`);
+      }
+      
       const csvContent = await response.text();
+      console.log('Arquivo carregado com sucesso. Tamanho:', csvContent.length, 'bytes');
+      
       const subjectsData = parseSubjectsCSV(csvContent, departments);
+
       await syncSubjects(subjectsData);
       alert(`${subjectsData.length} disciplinas sincronizadas!`);
     } catch (e) {

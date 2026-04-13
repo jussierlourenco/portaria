@@ -105,16 +105,31 @@ export const deleteSubject = async (subjectId) => {
 
 export const syncSubjects = async (subjectsData) => {
   const subjectsCol = collection(db, 'subjects');
+  
+  // 1. Limpar coleção atual
   const snapshot = await getDocs(subjectsCol);
-  const deletePromises = snapshot.docs.map(docSnapshot => deleteDoc(doc(db, 'subjects', docSnapshot.id)));
-  await Promise.all(deletePromises);
+  const deleteBatch = writeBatch(db);
+  snapshot.docs.forEach(docSnap => deleteBatch.delete(docSnap.ref));
+  await deleteBatch.commit();
 
-  const addPromises = subjectsData.map(subject => addDoc(subjectsCol, {
-    ...subject,
-    createdAt: serverTimestamp()
-  }));
-  await Promise.all(addPromises);
+  // 2. Adicionar novos dados em lotes (max 500 por lote)
+  for (let i = 0; i < subjectsData.length; i += 400) {
+    const batch = writeBatch(db);
+    const chunk = subjectsData.slice(i, i + 400);
+    
+    chunk.forEach(subject => {
+      const newDocRef = doc(collection(db, 'subjects'));
+      batch.set(newDocRef, {
+        ...subject,
+        createdAt: serverTimestamp()
+      });
+    });
+    
+    await batch.commit();
+    console.log(`Lote de ${chunk.length} disciplinas gravado...`);
+  }
 };
+
 
 
 // Check-in (Open Room)
