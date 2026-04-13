@@ -63,11 +63,13 @@ export const parseSubjectsCSV = (csvContent, departments = []) => {
       subjects.push({
         code,
         name,
+        department: deptNameRaw || 'Geral', // Guardamos o nome raw para colorização
         departmentId: deptId,
         credits: columns[3] || '',
         capacity: columns[5] || '',
         fullLine: line
       });
+
     }
   }
 

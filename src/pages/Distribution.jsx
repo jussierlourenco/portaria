@@ -91,8 +91,20 @@ const Distribution = () => {
   // Helper para buscar informações da disciplina pelo código
   const getSubjectInfo = (code) => {
     const subject = subjects.find(s => s.code === code);
-    return subject || { code, name: 'Disciplina não encontrada', department: 'Geral' };
+    const departmentName = subject?.department || subject?.departmentId || code.substring(0, 3) || 'Geral';
+    
+    if (subject) {
+      return { ...subject, department: departmentName };
+    }
+    
+    return { 
+      code, 
+      name: 'Disciplina não encontrada', 
+      department: departmentName 
+    };
   };
+
+
 
   return (
     <div className="space-y-8 pb-20">
