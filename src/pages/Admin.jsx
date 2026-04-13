@@ -142,6 +142,7 @@ const Admin = () => {
       </div>
 
       <RoomAdminModal 
+        key={editingRoom?.id || 'new'}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}

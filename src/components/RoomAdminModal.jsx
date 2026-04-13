@@ -1,33 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { clsx } from 'clsx';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const RoomAdminModal = ({ isOpen, onClose, onSave, room }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    block: 'Bloco A',
-    pavilion: 'Térreo',
-    nextEventTime: ''
+    name: room?.name || '',
+    block: room?.block || 'Bloco A',
+    pavilion: room?.pavilion || 'Térreo',
+    nextEventTime: room?.nextEventTime || ''
   });
 
-  useEffect(() => {
-    if (room) {
-      setFormData({
-        name: room.name || '',
-        block: room.block || 'Bloco A',
-        pavilion: room.pavilion || 'Térreo',
-        nextEventTime: room.nextEventTime || ''
-      });
-    } else {
-      setFormData({
-        name: '',
-        block: 'Bloco A',
-        pavilion: 'Térreo',
-        nextEventTime: ''
-      });
-    }
-  }, [room, isOpen]);
+  // State is now refreshed via 'key' prop in parent Admin.jsx
 
   if (!isOpen) return null;
 
