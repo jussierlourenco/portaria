@@ -23,9 +23,9 @@ const Sidebar = () => {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-100 flex flex-col z-50">
       <div className="p-6 border-b border-slate-50 flex items-center gap-3">
         <img 
-          src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
-          alt="CB Logo" 
-          className="h-10"
+          src="/icon.png" 
+          alt="CB Icon" 
+          className="h-12 drop-shadow-sm"
         />
         <div>
           <h1 className="text-lg font-black text-brand-primary tracking-tighter leading-none">Portaria CB</h1>

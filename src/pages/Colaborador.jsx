@@ -21,9 +21,9 @@ const Colaborador = () => {
     <div className="min-h-screen bg-slate-50 p-6">
       <header className="mb-10 text-center">
         <img 
-          src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
+          src="/logo.png" 
           alt="Logo CB" 
-          className="h-16 mx-auto mb-4 drop-shadow-sm"
+          className="h-28 mx-auto mb-4 drop-shadow-sm"
         />
         <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">Portaria CB</h1>
         <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Gestão de Salas</p>

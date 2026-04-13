@@ -31,9 +31,9 @@ const Login = () => {
       <div className="glass-card p-10 w-full max-w-md shadow-2xl shadow-brand-primary/10 border-white/40">
         <div className="text-center mb-10">
           <img 
-            src="https://firebasestorage.googleapis.com/v0/b/sicb-ed14a.appspot.com/o/brand%2Flogo_cb.png?alt=media&token=6a182060-e41c-4384-9669-02688002df35" 
+            src="/logo.png" 
             alt="Logo CB" 
-            className="h-20 mx-auto mb-4 drop-shadow-sm"
+            className="h-40 mx-auto mb-4 drop-shadow-sm"
           />
           <h1 className="text-3xl font-black text-brand-primary tracking-tighter uppercase italic">Portaria CB</h1>
           <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Gestão de Salas</p>
