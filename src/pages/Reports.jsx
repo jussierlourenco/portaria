@@ -84,7 +84,8 @@ const Reports = () => {
             slot: slot,
             status: inspectionLog ? 'vistoriada' : 'pendente',
             inspectorName: inspector?.displayName || '---',
-            inspectionTime: inspectionLog ? inspectionLog.timestamp?.toDate()?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '---'
+            inspectionTime: inspectionLog ? inspectionLog.timestamp?.toDate()?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '---',
+            location: inspectionLog?.location || null
           };
 
           // Aplicar filtro de modo de visualização
@@ -101,7 +102,7 @@ const Reports = () => {
   const reportData = getRondaReport();
 
   const handleExportCSV = () => {
-    const headers = ['Sala', 'Bloco', 'Horario Vaga', 'Status', 'Porteiro', 'Hora do Bip'];
+    const headers = ['Sala', 'Bloco', 'Horario Vaga', 'Status', 'Porteiro', 'Hora do Bip', 'Latitude', 'Longitude'];
     const csvContent = [
       headers.join(','),
       ...reportData.map(r => [
@@ -110,7 +111,9 @@ const Reports = () => {
         r.slot,
         r.status.toUpperCase(),
         r.inspectorName,
-        r.inspectionTime
+        r.inspectionTime,
+        r.location?.latitude || '',
+        r.location?.longitude || ''
       ].join(','))
     ].join('\n');
 
@@ -245,7 +248,26 @@ const Reports = () => {
                     {item.status === 'vistoriada' ? (
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-slate-700 uppercase">{item.inspectorName}</span>
-                        <span className="text-[9px] font-bold text-brand-primary uppercase tracking-widest">Bipado às {item.inspectionTime}</span>
+                        <div className="flex items-center gap-2">
+                           <span className="text-[9px] font-bold text-brand-primary uppercase tracking-widest">Bipado às {item.inspectionTime}</span>
+                           {item.location && (
+                             <a 
+                               href={`https://www.google.com/maps?q=${item.location.latitude},${item.location.longitude}`} 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-100 hover:bg-brand-primary hover:text-white rounded text-[8px] font-black text-slate-500 transition-colors uppercase"
+                               title="Ver no Google Maps"
+                             >
+                                <MapPin size={8} />
+                                Local
+                             </a>
+                           )}
+                        </div>
+                        {item.location && (
+                          <span className="text-[7px] text-slate-300 font-medium mt-0.5">
+                            {item.location.latitude.toFixed(6)}, {item.location.longitude.toFixed(6)}
+                          </span>
+                        )}
                       </div>
                     ) : (
                       <span className="text-slate-300 italic text-[10px]">Aguardando ronda...</span>

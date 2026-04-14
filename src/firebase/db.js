@@ -174,12 +174,13 @@ export const roomCheckOut = async (roomId, userId, checklist) => {
 };
 
 // Log room inspection (QR Code)
-export const logRoomInspection = async (roomId, userId) => {
+export const logRoomInspection = async (roomId, userId, location = null) => {
   await addDoc(collection(db, 'logs'), {
     roomId,
     type: 'inspection',
     userId,
     timestamp: serverTimestamp(),
+    location: location // { latitude, longitude }
   });
 };
 

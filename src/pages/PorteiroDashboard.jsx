@@ -28,9 +28,33 @@ const PorteiroDashboard = () => {
     }
   };
 
+  const getCurrentLocation = () => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error('Erro ao capturar localização:', error);
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    });
+  };
+
   const handleScanSuccess = useCallback(async (data) => {
     try {
-      await logRoomInspection(data.id, user.uid);
+      const location = await getCurrentLocation();
+      await logRoomInspection(data.id, user.uid, location);
       setScanMessage({ type: 'success', text: `Vistoria confirmada: ${data.name}` });
       setIsScannerOpen(false);
       setTimeout(() => setScanMessage(null), 4000);
